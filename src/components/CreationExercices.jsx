@@ -15,6 +15,7 @@ import Chip from '@mui/material/Chip';
 import { useNavigate } from 'react-router-dom';
 
 import Header from './Header';
+import Footer from './Footer';
 
 
 const Container = styled.div`
@@ -27,7 +28,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  ${desktop({ height: '110vh' })}
+  ${desktop({ height: '100%' })}
 `;
 
 const Wrapper = styled.div`
@@ -37,7 +38,7 @@ const Wrapper = styled.div`
   margin-bottom: 5rem;
   background-color: white;
   border-radius: 2rem;
-  ${desktop({ width: '50rem', marginBottom: '0rem', height: '36rem' })}
+  ${desktop({ width: '50rem', marginBottom: '3.2rem', height: '36rem' })}
 `;
 
 const Form = styled.form`
@@ -240,7 +241,6 @@ const categorie =
       target: { value },
     } = event;
     setAge(
-      // On autofill we get a stringified value.
       typeof value === 'string' ? value.split(',') : value
     );
   };
@@ -250,7 +250,6 @@ const categorie =
       target: { value },
     } = event;
     setTraining(
-      // On autofill we get a stringified value.
       typeof value === 'string' ? value.split(',') : value
     );
   };
@@ -387,6 +386,7 @@ const categorie =
           </ButtonContainer>
         </Form>
       </Wrapper>
+      <Footer />
     </Container>
   );
 };

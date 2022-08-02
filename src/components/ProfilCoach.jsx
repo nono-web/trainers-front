@@ -20,15 +20,9 @@ const Container = styled.div`
  
 `;
 
-const Image = styled.img`
-  width: 17rem;
-  margin-bottom: 0.5rem;
-  ${desktop({ width: '30rem', height: '20rem' })}
-`;
-
 const Wrapper = styled.div`
   display: flex;
-  flex-direction: column;
+flex-direction: column;
   align-items: center;
   background-color: white;
   padding: 0.5rem;
@@ -41,36 +35,6 @@ const Title = styled.h1`
 text-align:center;
 `;
 
-const Desc = styled.p`
-  margin: 0.5rem;
-  text-align: center;
-  ${desktop({ padding: '0rem 2rem' })}
-`;
-
-const Texterea = styled.textarea`
-  flex: 1;
-  width: 15rem;
-  margin: 0.3rem 1rem 1rem 1rem;
-  padding: 0.7rem;
-  border-radius: 2rem;
-  border: solid 1px var(--dark);
-  text-align: center;
-  &::placeholder {
-    text-align: center;
-  }
-  ${desktop({ width: '20rem' })}
-`;
-
-const AgeTitle = styled.h4`
-  margin-bottom: 0.5rem;
-`;
-
-const Age = styled.p``;
-
-const Time = styled.p`
-  margin: 0.5rem;
-`;
-
 const Input = styled.input`
   width: 15rem;
   border-radius: 2rem;
@@ -78,12 +42,6 @@ const Input = styled.input`
     text-align: center;
   }
 `;
-
-const TrainingTitle = styled.h4`
-  margin: 0.5rem;
-`;
-
-const Training = styled.p``;
 
 const ButtonContainer = styled.div`
   margin-top: 0.5rem;
@@ -125,84 +83,93 @@ margin: 0.5rem;
 text-align:center;
 `
 
-const EditExercices = () => {
+const ProfilCoach = () => {
   const { id } = useParams();
   const navigator = useNavigate();
   const onCancel = () => navigator('/exercices');
 
-  const [exercice, setExercice] = useState([]);
-  const [desc, setDesc] = useState(null);
-  const [time, setTime] = useState(null);
-  const [name, setName] = useState(null);
-  const [img, setImg] = useState(null);
+  const [profil, setProfil] = useState([]);
+  const [firstname, setFirsname] = useState(null);
+  const [lastname, setLastname] = useState(null);
+  const [username, setUsername] = useState(null);
+  const [email, setEmail] = useState(null);
+  const [password, setPassword] = useState(null);
+  const [club, setClub] = useState(null);
+  const [phoneNumber, setPhoneNumber] = useState(null);
+  
 
   useEffect(() => {
-    const fetchDataExerciceDetails = async () => {
+    const fetchDataProfil = async () => {
       const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/exercice/${id}`
+        `${process.env.REACT_APP_API_URL}/api/coach/${id}`
       );
-      setExercice(res.data);
+      setProfil(res.data);
       console.log(res.data);
     };
-    fetchDataExerciceDetails();
+    fetchDataProfil();
   }, [id]);
 
   const handleChange = () => {
     const values = {
-      desc,
-      time,
-      name,
-      img,
+      firstname,
+      lastname,
+      username,
+      email,
+      password,
+      club,
+      phoneNumber
     };
     axios
-      .put(`${process.env.REACT_APP_API_URL}/api/exercice/${id}`, values)
+      .put(`${process.env.REACT_APP_API_URL}/api/coach/${id}`, values)
       .then(({ data }) => {
         console.log({
           data,
         });
-       return  navigator(`/exercices/${id}`);
+       return  alert("Votre profil a été modifié");
       });
   };
 
   return (
     <Container>
       <Header />
-      <Image src={exercice.img} />
-      <Input
-        type="text"
-        placeholder="Modifier l'image de l'exercice"
-        onChange={(e) => setImg(e.target.value)}
-      />
       <Wrapper>
-        <Title>{exercice.name}</Title>
+        <Title>{profil.firstname}</Title>
         <Input
           type="text"
-          placeholder="Modifier le nom de l'exercice"
-          onChange={(e) => setName(e.target.value)}
+          placeholder="Modifier votre nom"
+          onChange={(e) => setFirsname(e.target.value)}
         />
-        <Desc>{exercice.desc}</Desc>
-        <Texterea
-          type="text"
-          rows="5"
-          cols="33"
-          name="desc"
-          placeholder="Modifier la description de l'exercice"
-          onChange={(e) => setDesc(e.target.value)}
-        />
-        <AgeTitle>Catégories : </AgeTitle>
-        {exercice.categoriesAge?.map((c) => (
-          <Age>{c}</Age>
-        ))}
-        <Time> Temps de l'exercice : {exercice.time} min</Time>
+         <Title>{profil.lastname}</Title>
         <Input
           type="text"
-          placeholder="Modifier le temps de l'exercice"
-          onChange={(e) => setTime(e.target.value)}
+          placeholder="Modifier votre prenom"
+          onChange={(e) => setLastname(e.target.value)}
         />
-        <TrainingTitle>Type d'entrainement : </TrainingTitle>
-        {exercice.typeTraining?.map((t) => (
-          <Training>{t}</Training>
-        ))}
+            <Title>{profil.username}</Title>
+        <Input
+          type="text"
+          placeholder="Modifier votre pseudo"
+          onChange={(e) => setUsername(e.target.value)}
+        />
+            <Title>{profil.email}</Title>
+        <Input
+          type="text"
+          placeholder="Modifier votre email"
+          onChange={(e) => setEmail(e.target.value)}
+        />
+            <Title>{profil.club}</Title>
+        <Input
+          type="text"
+          placeholder="Modifier votre club"
+          onChange={(e) => setClub(e.target.value)}
+        />
+        <Title>{profil.phoneNumber}</Title>
+           <Input
+          type="text"
+          placeholder="Modifier votre numero de téléphone"
+          onChange={(e) => setPhoneNumber(e.target.value)}
+        />
+      
         <Warning> ⚠ Tout les champs doivent étre remplis pour modifier l'exercice </Warning>
         <ButtonContainer>
           <Button onClick={handleChange}>Modifié l'exercice</Button>
@@ -214,4 +181,4 @@ const EditExercices = () => {
   );
 };
 
-export default EditExercices;
+export default ProfilCoach;

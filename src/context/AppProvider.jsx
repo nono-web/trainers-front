@@ -3,12 +3,34 @@ import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 const AppContext = createContext(null);
 
 const AppProvider = ({ children }) => {
+  const [orderTrainingPlane, setOrderTrainingPlane] = useState(
+    localStorage.getItem('orderTrainingPlane')
+      ? JSON.parse(localStorage.getItem('orderTrainingPlane'))
+      : []
+  );
+
   const [coach, setCoach] = useState(
     localStorage.getItem('coach')
       ? JSON.parse(localStorage.getItem('coach'))
-      : null
+      : {}
   );
-  
+  const [favoritesExercicesList, setfavoritesExercicesList] = useState(
+    localStorage.getItem('favoritesExercicesList')
+      ? JSON.parse(localStorage.getItem('favoritesExercicesList'))
+      : []
+  );
+
+  useEffect(() => {
+    if (favoritesExercicesList) {
+      localStorage.setItem(
+        'favoritesExercicesList',
+        JSON.stringify(favoritesExercicesList)
+      );
+    } else {
+      localStorage.removeItem('favoritesExercicesList');
+    }
+  }, [favoritesExercicesList]);
+
   useEffect(() => {
     if (coach) {
       localStorage.setItem('coach', JSON.stringify(coach));
@@ -17,12 +39,24 @@ const AppProvider = ({ children }) => {
     }
   }, [coach]);
 
+  useEffect(() => {
+    if (orderTrainingPlane) {
+      localStorage.setItem('orderTrainingPlane', JSON.stringify(orderTrainingPlane));
+    } else {
+      localStorage.removeItem('orderTrainingPlane');
+    }
+  }, [orderTrainingPlane]);
+
   const AppStates = useMemo(
     () => ({
       coach,
       setCoach,
+      orderTrainingPlane,
+      setOrderTrainingPlane,
+      favoritesExercicesList,
+      setfavoritesExercicesList,
     }),
-    [coach]
+    [coach, favoritesExercicesList, orderTrainingPlane]
   );
 
   return (

@@ -10,7 +10,6 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppProvider';
 import Header from './Header';
 
-
 const Container = styled.div`
   width: 100vw;
   height: 100vh;
@@ -21,7 +20,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  ${desktop({ height: '100vh'})}
+  ${desktop({ height: '100vh' })}
 `;
 
 const Wrapper = styled.div`
@@ -31,7 +30,7 @@ const Wrapper = styled.div`
   margin-bottom: 5rem;
   background-color: white;
   border-radius: 2rem;
-  ${desktop({width:'25rem', marginBottom: '0rem', height: '23rem'})}
+  ${desktop({ width: '25rem', marginBottom: '0rem', height: '23rem' })}
 `;
 
 const Form = styled.form`
@@ -71,16 +70,14 @@ const Input = styled.input`
   padding: 0.7rem;
   border-radius: 2rem;
   border: solid 1px var(--dark);
-  text-align:center;
+  text-align: center;
   &::placeholder {
     text-align: center;
   }
-  ${desktop({width: '20rem'})}
+  ${desktop({ width: '20rem' })}
 `;
 
-const DisplayPassword = styled.div `
-
-`
+const DisplayPassword = styled.div``;
 const Button = styled.button`
   width: 15rem;
   border: none;
@@ -99,20 +96,16 @@ const Button = styled.button`
   ${desktop({ margin: '1rem ', width: '20rem' })}
 `;
 
-
-
-
-const ErrorYup = styled.p `
-color: tomato;
-text-align:center;
-font-size: 0.9rem;
-&::before {
-  display: inline;
-  content: '⚠';
-}
-${desktop({ fontSize:'1.1rem'})}
-
-`
+const ErrorYup = styled.p`
+  color: tomato;
+  text-align: center;
+  font-size: 0.9rem;
+  &::before {
+    display: inline;
+    content: '⚠';
+  }
+  ${desktop({ fontSize: '1.1rem' })}
+`;
 const Link = styled.p`
   margin: 0.3rem 0rem;
   font-size: 1rem;
@@ -120,18 +113,16 @@ const Link = styled.p`
   cursor: pointer;
 `;
 
-const Error = styled.span `
-color: red;
-margin-bottom: 1rem;
-`
+const Error = styled.span`
+  color: red;
+  margin-bottom: 1rem;
+`;
 
 const Login = () => {
-
-    const [checked, setChecked] = useState(false);
-    const [error, setError] = useState(false);
-    const { setCoach, coach } = useApp();
-    const navigator = useNavigate();
-    
+  const [checked, setChecked] = useState(false);
+  const [error, setError] = useState(false);
+  const { setCoach, setfavoritesExercicesList } = useApp();
+  const navigator = useNavigate();
 
   const schema = yup
     .object({
@@ -144,7 +135,6 @@ const Login = () => {
         .string()
         .max(255)
         .required("Veuillez entrer votre mot de passe s'il vous plait"),
-    
     })
     .required();
 
@@ -156,24 +146,19 @@ const Login = () => {
     resolver: yupResolver(schema),
   });
 
-  
   const onSubmit = async (values) => {
-    const {
-      email,
-      password,
-    } = values;
+    const { email, password } = values;
 
     try {
-      const { data: {  isAdmin, favorites, id } } = await axios
-        .post(
-        `${process.env.REACT_APP_API_URL}/api/auth/login`,
-          {
-            email,
-            password,
-          },
-        );
-        console.log('login',isAdmin, favorites, id  )
-        setCoach({isAdmin: isAdmin, favorites: favorites, _id: id  });
+      const {
+        data: { isAdmin, favoritesExercices, id },
+      } = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
+        email,
+        password,
+      });
+      console.log('login', isAdmin, favoritesExercices, id);
+      setCoach({ isAdmin: isAdmin, _id: id });
+      setfavoritesExercicesList(favoritesExercices);
       return isAdmin ? navigator('/admin') : navigator('/exercices');
     } catch (err) {
       return setError(!error);
@@ -183,35 +168,50 @@ const Login = () => {
   const handleChange = () => setChecked(!checked);
 
   const onInscription = () => {
-    navigator("/enregistrement")
-  }
+    navigator('/enregistrement');
+  };
 
   return (
     <Container>
-        <Header />
+      <Header />
       <Wrapper>
         <Title>Connexion</Title>
         <Form onSubmit={handleSubmit(onSubmit)}>
           <FormContainer>
-          {errors.email && <ErrorYup>{errors.email.message}</ErrorYup>}
+            {errors.email && <ErrorYup>{errors.email.message}</ErrorYup>}
             <Label>
               {' '}
               Email* :
-              <Input type="text" name="email" placeholder="Email" {...register("email")} />
+              <Input
+                type="text"
+                name="email"
+                placeholder="Email"
+                {...register('email')}
+              />
             </Label>
           </FormContainer>
           <FormContainer>
-          {errors.password && <ErrorYup>{errors.password.message}</ErrorYup>}
+            {errors.password && <ErrorYup>{errors.password.message}</ErrorYup>}
             <Label>
               {' '}
               mot de passe * :
-              <Input  name="password"  placeholder="mot de passe" type={checked ? 'text' : 'password'} {...register("password")}  />
+              <Input
+                name="password"
+                placeholder="mot de passe"
+                type={checked ? 'text' : 'password'}
+                {...register('password')}
+              />
             </Label>
           </FormContainer>
           <DisplayPassword>
-            <Label> Afficher le mot de passe
-                <Input  checked={checked}
-            onChange={handleChange} type="checkbox" />
+            <Label>
+              {' '}
+              Afficher le mot de passe
+              <Input
+                checked={checked}
+                onChange={handleChange}
+                type="checkbox"
+              />
             </Label>
           </DisplayPassword>
           <Button>Connexion</Button>

@@ -47,10 +47,9 @@ const Icon = styled.img`
   cursor: pointer;
 `;
 
-const Exercice = ({ item, getExercices }) => {
+const Exercice = ({ item, getExercices, filteredExercices }) => {
   const navigator = useNavigate();
-  const { coach, setCoach } = useApp();
-  const [favoritesList, setFavoritesList] = useState([coach.favorites]);
+  const { coach, favoritesExercicesList } = useApp();
 
   const onSearch = () => {
     navigator(`/exercices/${item._id}`);
@@ -67,52 +66,59 @@ const Exercice = ({ item, getExercices }) => {
     getExercices();
   };
 
-  useEffect(() => {
-    getExercices();
-    console.log(favoritesList);
-    console.log('id', coach._id);
-  }, [coach]);
+  useEffect(() => {}, []);
 
-  const getCoachData = async () => {
-    const res = await axios.get(
-      `${process.env.REACT_APP_API_URL}/api/coach/${coach._id}`
-    );
-    setCoach(res.data);
-  };
-
-  const handleAddFavorite = async (itemId) => { 
-    
+  const handleAddFavorite = async (itemId) => {
+    console.log('favoritesExercicesList', favoritesExercicesList);
     try {
-      const getCoach = localStorage.getItem('coach');
-      const coachFavorites = getCoach ? JSON.parse(getCoach) : {};
-      console.log(coachFavorites)
-      if(coachFavorites.favorites.includes(itemId)) {
-      await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/coach/addFavorites/${coach._id}`,
-        {
-          newFavorite: itemId,
-        }
-      );}
-      getCoachData();
-      coachFavorites.favorites.push(itemId);
-      localStorage.setItem('coach', JSON.stringify(coachFavorites));
-      alert(`exercices added`);
-      
+      await axios
+        .post(
+          `${process.env.REACT_APP_API_URL}/api/coach/favoritesExercices/${coach._id}`,
+          {
+            newFavoriteExId: itemId,
+          }
+        )
+        .then(({ data }) => {
+          console.log('favoriteExerciceId', data.response);
+
+          favoritesExercicesList.push(data.response);
+          localStorage.setItem(
+            'favoritesExercicesList',
+            JSON.stringify(favoritesExercicesList)
+          );
+          getExercices();
+
+          alert(`New Favorites Exercices added`);
+        });
     } catch (err) {
       console.log(err);
     }
-  }
+  };
 
-  ;
-  function onRemoveFavorites(itemId) {
-    const getCoach = localStorage.getItem('coach');
-    const coachFavorites = getCoach ? JSON.parse(getCoach) : {};
-    let index = coachFavorites.favorites.indexOf(itemId);
-    coachFavorites.favorites.slice(index, 1);
-    
-    localStorage.setItem('coach', JSON.stringify(coachFavorites));
-    alert(`exercices delete`);
-  }
+  const handleRemoveFavorite = async (itemId) => {
+    try {
+      await axios
+        .post(
+          `${process.env.REACT_APP_API_URL}/api/coach/removeOneFavoriteExe/${coach._id}`,
+          {
+            favoriteExId: itemId,
+          }
+        )
+        .then(({ data }) => {
+          console.log('favoriteExerciceId to remove', data.response);
+          const removeIndex = favoritesExercicesList.indexOf(data.response);
+          favoritesExercicesList.splice(removeIndex, 1);
+          localStorage.setItem(
+            'favoritesExercicesList',
+            JSON.stringify(favoritesExercicesList)
+          );
+          getExercices();
+          alert(`exercices delete`);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <Container>
@@ -123,11 +129,23 @@ const Exercice = ({ item, getExercices }) => {
         <IconContainer>
           <Icon src={search} onClick={onSearch} />
           <Icon src={edit} onClick={onEdit} />
-          {coach.favorites.includes(item._id) && (
-            <Icon src={heart} onClick={() => onRemoveFavorites(item._id)} />
+          {favoritesExercicesList?.includes(item._id) && (
+            <Icon
+              src={heart}
+              onClick={(e) => {
+                handleRemoveFavorite(item._id);
+                e.stopPropagation();
+              }}
+            />
           )}
-          {!coach.favorites.includes(item._id) && (
-            <Icon src={heartVide} onClick={() => handleAddFavorite(item._id)} />
+          {!favoritesExercicesList?.includes(item._id) && (
+            <Icon
+              src={heartVide}
+              onClick={(e) => {
+                handleAddFavorite(item._id);
+                e.stopPropagation();
+              }}
+            />
           )}
           <Icon src={poubelle} onClick={() => handleReset(item._id)} />
         </IconContainer>

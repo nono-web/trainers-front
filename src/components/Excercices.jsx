@@ -50,10 +50,12 @@ const Excercices = ({ filters, sort }) => {
     }
   }, [sort]);
 
+
+
   return (
     <Container>
       {filteredExercices.map((item) => (
-        <Exercice item={item} key={item._id} getExercices={getExercices}  />
+        <Exercice item={item} key={item._id} getExercices={getExercices} filteredExercices={filteredExercices} />
       ))}
     </Container>
   );

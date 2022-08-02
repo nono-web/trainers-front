@@ -1,24 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+
 import { desktop } from '../responsive';
 import Header from './Header';
 import Exercices from '../components/Excercices';
+import Footer from './Footer';
 
 const Container = styled.div`
   width: 100vw;
-  height: 100%;
+  height: auto;
   background: url('https://images.pexels.com/photos/47343/the-ball-stadion-horn-corner-47343.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')
     center;
   background-size: cover;
   display: flex;
   flex-direction: column;
-  ${desktop({ height:"150%"})}
+ 
 `;
 
 const Title = styled.h1`
   text-align: center;
   margin-bottom: 1rem;
+  font-size: 3rem;
 `;
 
 const FilterContainer = styled.div`
@@ -55,30 +57,10 @@ const Select = styled.select`
 `;
 const Option = styled.option``;
 
-const Button = styled.button`
-  width: 15rem;
-  border: none;
-  border-radius: 1.2rem;
-  padding: 1rem 1.2rem;
-  margin: 0 auto;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  color: var(--dark);
-  background-color: var(--green);
-  transition: all 0.2s ease-out;
-  &:hover {
-    background-color: var(--light-green);
-    color: var(--dark-green);
-    cursor: pointer;
-  }
-  ${desktop({ width: '20rem' })}
-`;
-
 const ExercicesList = () => {
-  const navigator = useNavigate();
+ 
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState('asc');
-
 
 
   const handleFilters = (e) => {
@@ -89,9 +71,6 @@ const ExercicesList = () => {
     });
   };
 
-  const handleCreate = () => {
-    navigator('/creationExercices');
-  };
 
   return (
     <Container>
@@ -118,8 +97,8 @@ const ExercicesList = () => {
             <Option>Pressing</Option>
             <Option>Passe</Option>
           </Select>
+        
         </Filter>
-        <Button onClick={handleCreate}>Créer son exercice</Button>
         <Filter>
           <FilterText>Trier les exercices: </FilterText>
           <Select onChange={(e) => setSort(e.target.value)}>
@@ -129,6 +108,7 @@ const ExercicesList = () => {
         </Filter>
       </FilterContainer>
       <Exercices filters={filters} sort={sort}/>
+      <Footer />
     </Container>
   );
 };
