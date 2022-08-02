@@ -126,10 +126,7 @@ const DetailsExercice = () => {
   const [exercice, setExercice] = useState([]);
   const [quantity, setQuantity] = useState(0);
   const { setOrderTrainingPlane, orderTrainingPlane } = useApp();
-
-  const isOrdered = (id) => {
-    return orderTrainingPlane.filter((item) => id === item._id);
-  };
+  const [isOrdered, setIsOrdered] = useState(null)
 
   const handleQuantity = (type) => {
     if (type === 'dec') {
@@ -182,9 +179,12 @@ const DetailsExercice = () => {
       console.log(res.data);
     };
     fetchDataExerciceDetails();
+    setIsOrdered(()=> orderTrainingPlane.find((item) => id === item._id))
     console.log('orderTraining', orderTrainingPlane);
     console.log('idParams',typeof(id))
   }, [id]);
+
+  console.log('isOrdered',isOrdered)
 
   return (
     <Container>
