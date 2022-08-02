@@ -126,11 +126,30 @@ const DetailsExercice = () => {
   const [exercice, setExercice] = useState([]);
   const [quantity, setQuantity] = useState(0);
   const { setOrderTrainingPlane, orderTrainingPlane } = useApp();
-  const [isOrdered, setIsOrdered] = useState(null)
+
+  const removeExIfQtyNull = () => {
+    orderTrainingPlane.some((item) => item.quantity === 0) &&
+      localStorage.setItem(
+        'orderTrainingPlane',
+        JSON.stringify(orderTrainingPlane.filter((p) => p._id !== id))
+      );
+  };
 
   const handleQuantity = (type) => {
     if (type === 'dec') {
-      setQuantity((prevState) => prevState - 1);
+      // setQuantity((prevState) => prevState - 1);
+      setOrderTrainingPlane(() =>
+        orderTrainingPlane
+          .filter((element) => {
+            return element._id === id;
+          })
+          .map((item) => {
+            item.quantity -= 1;
+            return item;
+          })
+      );
+    } else {
+      // setQuantity((prevState) => prevState + 1);
       setOrderTrainingPlane(() =>
         orderTrainingPlane
           .filter((element) => {
@@ -138,18 +157,6 @@ const DetailsExercice = () => {
           })
           .map((item) => {
             item.quantity += 1;
-            return item;
-          })
-      );
-    } else {
-      setQuantity((prevState) => prevState + 1);
-      setOrderTrainingPlane(() =>
-        orderTrainingPlane
-          .filter((element) => {
-            return element._id === id[0];
-          })
-          .map((item) => {
-            item.quantity -= 1;
             return item;
           })
       );
@@ -161,14 +168,10 @@ const DetailsExercice = () => {
   };
 
   const handleClickCart = (id) => {
-   /*  let newOrder = { ...exercice, quantity: 1 };
-    !isOrdered(id) &&
-      orderTrainingPlane.length > 0 &&
-      quantity === 0 &&
-      setOrderTrainingPlane(() => orderTrainingPlane.push(newOrder)); */
-     console.log(orderTrainingPlane.find((item) => item._id === id));
+    let newOrder = { ...exercice, quantity: 1 };
+    setOrderTrainingPlane(() => [...orderTrainingPlane, newOrder]);
+    setQuantity((prevState) => (prevState += 1));
   };
-  console.log(orderTrainingPlane);
 
   useEffect(() => {
     const fetchDataExerciceDetails = async () => {
@@ -179,12 +182,13 @@ const DetailsExercice = () => {
       console.log(res.data);
     };
     fetchDataExerciceDetails();
-    setIsOrdered(()=> orderTrainingPlane.find((item) => id === item._id))
-    console.log('orderTraining', orderTrainingPlane);
-    console.log('idParams',typeof(id))
+    removeExIfQtyNull();
+    console.log('orderTrainingPlane', orderTrainingPlane);
+    console.log(
+      'isIdExist in training plane',
+      orderTrainingPlane.some((item) => item._id === id)
+    );
   }, [id]);
-
-  console.log('isOrdered',isOrdered)
 
   return (
     <Container>
@@ -202,36 +206,49 @@ const DetailsExercice = () => {
         {exercice.typeTraining?.map((t) => (
           <Training>{t}</Training>
         ))}
-        <AmountContainer>
-          <svg
-            width="1rem"
-            height="1rem"
-            viewBox="0 0 24 24"
-            onClick={() => handleQuantity('dec')}
-          >
-            <path
-              fill="currentColor"
-              d="M18 13H6c-.55 0-1-.45-1-1s.45-1 1-1h12c.55 0 1 .45 1 1s-.45 1-1 1z"
-            ></path>
-          </svg>
 
-          <Amount>{quantity}</Amount>
-          <svg
+        <AmountContainer>
+          <p
+            styled={{ cursor: 'pointer' }}
             width="1rem"
             height="1rem"
             viewBox="0 0 24 24"
-            onClick={() => handleQuantity('inc')}
+            onClick={(event) => {
+              event.stopPropagation();
+              handleQuantity('dec');
+            }}
           >
-            <path
-              fill="currentColor"
-              d="M19 12.998h-6v6h-2v-6H5v-2h6v-6h2v6h6z"
-            ></path>
-          </svg>
+            -
+          </p>
+          <Amount style={{ width: '1rem', height: '1rem', margin: '10px' }}>
+            {orderTrainingPlane.some((exercice) => exercice._id === id)
+              ? orderTrainingPlane
+                  .filter((exercice) => exercice._id === id)
+                  .map((item) => item.quantity)
+              : quantity}
+          </Amount>
+          <p
+            styled={{ cursor: 'pointer' }}
+            width="1rem"
+            height="1rem"
+            viewBox="0 0 24 24"
+            onClick={(event) => {
+              event.stopPropagation();
+              handleQuantity('inc');
+            }}
+          >
+            +
+          </p>
         </AmountContainer>
+
         <ButtonContainer>
-          <Button onClick={handleClickCart}>
-            Ajouter au panier d'exercices{' '}
-          </Button>
+          {!orderTrainingPlane.some((item) => item._id === id) ? (
+            <Button onClick={() => handleClickCart(id)}>
+              Ajouter au panier d'exercices{' '}
+            </Button>
+          ) : (
+            ''
+          )}
           <Button onClick={onEditExercice}>Modifier Exercice</Button>
           <Button onClick={onCancel}>Revenir aux exercices</Button>
         </ButtonContainer>
