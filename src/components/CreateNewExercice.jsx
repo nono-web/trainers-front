@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { desktop } from '../responsive';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useApp } from '../context/AppProvider';
 import * as yup from 'yup';
 import axios from 'axios';
 import Box from '@mui/material/Box';
@@ -16,7 +17,6 @@ import { useNavigate } from 'react-router-dom';
 
 import Header from './Header';
 import Footer from './Footer';
-
 
 const Container = styled.div`
   width: 100vw;
@@ -43,7 +43,7 @@ const Wrapper = styled.div`
 
 const Form = styled.form`
   display: flex;
-flex-wrap: wrap;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   padding: 1rem;
@@ -128,7 +128,7 @@ const ErrorYup = styled.p`
   ${desktop({ fontSize: '1rem' })}
 `;
 
-const Textarea = styled.textarea `
+const Textarea = styled.textarea`
   flex: 1;
   width: 15rem;
   margin: 0.3rem 1rem 1rem 1rem;
@@ -140,31 +140,30 @@ const Textarea = styled.textarea `
     text-align: center;
   }
   ${desktop({ width: '20rem' })}
-`
+`;
 
-const Register = () => {
+const CreateNewExercice = () => {
   const [error, setError] = useState('');
   const navigator = useNavigate();
   const [age, setAge] = useState([]);
   const [training, setTraining] = useState([]);
-const categorie = 
-  {
+  const { coach } = useApp();
+  const categorie = {
     'U6-U7': 'U6-U7',
     'U8-U9': 'U8-U9',
     'U10-U11': 'U10-U11',
     'U12-U13': 'U12-U13',
     'U14-U15': 'U14-U15',
-  }
+  };
 
-  const type = 
-  {
-    'passe': 'passe',
-    'physique': 'phyisque',
-    'stalom': 'stalom',
-    'gardien': 'gardien',
-    'pressing': 'pressing',
-    'course': 'course'
-  }
+  const type = {
+    passe: 'passe',
+    physique: 'phyisque',
+    stalom: 'stalom',
+    gardien: 'gardien',
+    pressing: 'pressing',
+    course: 'course',
+  };
 
   const schema = yup
     .object({
@@ -185,7 +184,7 @@ const categorie =
       categoriesAge: yup
         .array()
         .max(255)
-        .typeError("Veuillez rentrer au moins une catégorie valide")
+        .typeError('Veuillez rentrer au moins une catégorie valide')
         .required("Merci de rentrer un moins une categorie s'il vous plait"),
       time: yup
         .number()
@@ -210,23 +209,20 @@ const categorie =
   } = useForm({
     resolver: yupResolver(schema),
   });
- 
 
   const onSubmit = async (values) => {
     const { name, desc, img, categoriesAge, time, typeTraining } = values;
 
     try {
-       await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/exercice`,
-        {
-          name,
-          desc,
-          img,
-          categoriesAge,
-          time,
-          typeTraining,
-        }
-      );
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/exercice`, {
+        coachId: coach._id,
+        name,
+        desc,
+        img,
+        categoriesAge,
+        time,
+        typeTraining,
+      });
       return navigator('/exercices');
     } catch (err) {
       setError(err.response.data);
@@ -240,18 +236,14 @@ const categorie =
     const {
       target: { value },
     } = event;
-    setAge(
-      typeof value === 'string' ? value.split(',') : value
-    );
+    setAge(typeof value === 'string' ? value.split(',') : value);
   };
 
   const handleTraining = (event) => {
     const {
       target: { value },
     } = event;
-    setTraining(
-      typeof value === 'string' ? value.split(',') : value
-    );
+    setTraining(typeof value === 'string' ? value.split(',') : value);
   };
 
   return (
@@ -261,9 +253,7 @@ const categorie =
         <Title>Créer votre exercice</Title>
         <Form onSubmit={handleSubmit(onSubmit)}>
           <FormContainer>
-            {errors.name && (
-              <ErrorYup>{errors.name.message}</ErrorYup>
-            )}
+            {errors.name && <ErrorYup>{errors.name.message}</ErrorYup>}
             <Label>
               {' '}
               Nom de l'exercice* :
@@ -291,34 +281,36 @@ const categorie =
           </FormContainer>
 
           <FormContainer>
-            {errors.categoriesAge && <ErrorYup>{errors.categoriesAge.message}</ErrorYup>}
+            {errors.categoriesAge && (
+              <ErrorYup>{errors.categoriesAge.message}</ErrorYup>
+            )}
             <Label>
               {' '}
-             Categories *:
-             < FormControl  sx={{ m: 1, width: 300, }}>
-        <InputLabel  >Categories</InputLabel>
-        <Select
-          multiple
-          value={age}
-          {...register('categoriesAge')}
-          onChange={handleCategories}
-          input={<OutlinedInput  label="Chip" />}
-          renderValue={(selected) => (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, }}>
-              {selected.map((value) => (
-                <Chip key={value} label={value} />
-              ))}
-            </Box>
-          )}
-        >
-        {Object.values(categorie).map((categories) => (
-            <MenuItem key={categories} value={categories}>
-              {categories}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-         </Label>
+              Categories *:
+              <FormControl sx={{ m: 1, width: 300 }}>
+                <InputLabel>Categories</InputLabel>
+                <Select
+                  multiple
+                  value={age}
+                  {...register('categoriesAge')}
+                  onChange={handleCategories}
+                  input={<OutlinedInput label="Chip" />}
+                  renderValue={(selected) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selected.map((value) => (
+                        <Chip key={value} label={value} />
+                      ))}
+                    </Box>
+                  )}
+                >
+                  {Object.values(categorie).map((categories) => (
+                    <MenuItem key={categories} value={categories}>
+                      {categories}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Label>
           </FormContainer>
 
           <FormContainer>
@@ -336,34 +328,36 @@ const categorie =
           </FormContainer>
 
           <FormContainer>
-            {errors.typeTraining && <ErrorYup>{errors.typeTraining.message}</ErrorYup>}
+            {errors.typeTraining && (
+              <ErrorYup>{errors.typeTraining.message}</ErrorYup>
+            )}
             <Label>
               {' '}
-             Type d'entrainement *:
-             < FormControl  sx={{ m: 1, width: 300, textAlign:'center'}}>
-        <InputLabel >Type d'entrainement</InputLabel>
-        <Select
-          multiple
-          value={training}
-          {...register('typeTraining')}
-          onChange={handleTraining}
-          input={<OutlinedInput  label="Chip" />}
-          renderValue={(selected) => (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, }}>
-              {selected.map((value) => (
-                <Chip key={value} label={value} />
-              ))}
-            </Box>
-          )}
-        >
-        {Object.values(type).map((types) => (
-            <MenuItem  key={types} value={types}>
-              {types}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-         </Label>
+              Type d'entrainement *:
+              <FormControl sx={{ m: 1, width: 300, textAlign: 'center' }}>
+                <InputLabel>Type d'entrainement</InputLabel>
+                <Select
+                  multiple
+                  value={training}
+                  {...register('typeTraining')}
+                  onChange={handleTraining}
+                  input={<OutlinedInput label="Chip" />}
+                  renderValue={(selected) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selected.map((value) => (
+                        <Chip key={value} label={value} />
+                      ))}
+                    </Box>
+                  )}
+                >
+                  {Object.values(type).map((types) => (
+                    <MenuItem key={types} value={types}>
+                      {types}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Label>
           </FormContainer>
           <FormContainer>
             {errors.desc && <ErrorYup>{errors.desc.message}</ErrorYup>}
@@ -391,4 +385,4 @@ const categorie =
   );
 };
 
-export default Register;
+export default CreateNewExercice;

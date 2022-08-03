@@ -123,43 +123,42 @@ const DetailsExercice = () => {
   const navigator = useNavigate();
   const onCancel = () => navigator('/exercices');
 
-  const [exercice, setExercice] = useState([]);
+  const [selectedExercice, setSelectedExercice] = useState({});
   const [quantity, setQuantity] = useState(0);
-  const { setOrderTrainingPlane, orderTrainingPlane } = useApp();
-
-  const removeExIfQtyNull = () => {
-    orderTrainingPlane.some((item) => item.quantity === 0) &&
-      localStorage.setItem(
-        'orderTrainingPlane',
-        JSON.stringify(orderTrainingPlane.filter((p) => p._id !== id))
-      );
-  };
+  const {
+    setOrderTrainingPlane,
+    orderTrainingPlane,
+    exercicesList,
+    setExercicesList,
+  } = useApp();
 
   const handleQuantity = (type) => {
     if (type === 'dec') {
-      // setQuantity((prevState) => prevState - 1);
-      setOrderTrainingPlane(() =>
-        orderTrainingPlane
-          .filter((element) => {
-            return element._id === id;
-          })
-          .map((item) => {
-            item.quantity -= 1;
-            return item;
-          })
-      );
+      setQuantity((prevState) => prevState - 1);
+
+      const newOrderTraining = orderTrainingPlane.map((item) => {
+        // 👇️ if id equals 2, update country property
+        if (item._id === id) {
+          return { ...item, quantity: (item.quantity -= 1) };
+        }
+
+        // 👇️ otherwise return iteme as is
+        return item;
+      });
+      setOrderTrainingPlane(newOrderTraining);
     } else {
-      // setQuantity((prevState) => prevState + 1);
-      setOrderTrainingPlane(() =>
-        orderTrainingPlane
-          .filter((element) => {
-            return element._id === id;
-          })
-          .map((item) => {
-            item.quantity += 1;
-            return item;
-          })
-      );
+      setQuantity((prevState) => prevState + 1);
+
+      const newOrderTraining = orderTrainingPlane.map((item) => {
+        // 👇️ if id equals 2, update country property
+        if (item._id === id) {
+          return { ...item, quantity: (item.quantity += 1) };
+        }
+
+        // 👇️ otherwise return itemect as is
+        return item;
+      });
+      setOrderTrainingPlane(newOrderTraining);
     }
   };
 
@@ -168,91 +167,205 @@ const DetailsExercice = () => {
   };
 
   const handleClickCart = (id) => {
-    let newOrder = { ...exercice, quantity: 1 };
+    let newOrder = { ...selectedExercice, quantity: 1 };
     setOrderTrainingPlane(() => [...orderTrainingPlane, newOrder]);
     setQuantity((prevState) => (prevState += 1));
   };
 
   useEffect(() => {
-    const fetchDataExerciceDetails = async () => {
-      const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/exercice/${id}`
-      );
-      setExercice(res.data);
-      console.log(res.data);
-    };
-    fetchDataExerciceDetails();
-    removeExIfQtyNull();
-    console.log('orderTrainingPlane', orderTrainingPlane);
+    exercicesList
+      .filter((selectedEx) => selectedEx._id === id)
+      .map((selectedEx) => setSelectedExercice(selectedEx));
+
     console.log(
-      'isIdExist in training plane',
-      orderTrainingPlane.some((item) => item._id === id)
+      'selectedId is included in planOrderEx',
+      orderTrainingPlane.some((plannedEx) => plannedEx._id === id)
     );
-  }, [id]);
+
+    orderTrainingPlane.some((plannedEx) => plannedEx._id === id) &&
+      orderTrainingPlane
+        .filter((element) => element._id === id)
+        .map((item) => {
+          setQuantity(item.quantity);
+        });
+
+    // const fetchDataExerciceDetails = async () => {
+    //   const res = await axios.get(
+    //     `${process.env.REACT_APP_API_URL}/api/exercice/${id}`
+    //   );
+    //   setExercice(res.data);
+    //   // console.log(res.data);
+    // };
+
+    // fetchDataExerciceDetails();
+
+    // quantity === 0 &&
+    //   setOrderTrainingPlane(() =>
+    //     orderTrainingPlane.filter((item) => item._id !== id)
+    //   );
+
+    // orderTrainingPlane.some((item) => item._id !== id) && setQuantity(0);
+    console.log('selectedId', id);
+    console.log('orderTrainingPlane', orderTrainingPlane);
+  }, [id, quantity, exercicesList, orderTrainingPlane]);
 
   return (
     <Container>
       <Header />
-      <Image src={exercice.img} />
-      <Wrapper>
-        <Title>{exercice.name}</Title>
-        <Desc>{exercice.desc}</Desc>
-        <AgeTitle>Catégories : </AgeTitle>
-        {exercice.categoriesAge?.map((c) => (
-          <Age>{c}</Age>
-        ))}
-        <Time> Temps de l'exercice : {exercice.time} min</Time>
-        <TrainingTitle>Type d'entrainement : </TrainingTitle>
-        {exercice.typeTraining?.map((t) => (
-          <Training>{t}</Training>
-        ))}
+      {!orderTrainingPlane.some((plannedEx) => plannedEx._id === id)
+        ? exercicesList
+            .filter((selectedEx) => selectedEx._id === id)
+            .map((element) => (
+              <>
+                <Image src={element.img} />
+                <Wrapper>
+                  <Title>{element.name}</Title>
+                  <Desc>{element.desc}</Desc>
+                  <AgeTitle>Catégories : </AgeTitle>
+                  {element.categoriesAge?.map((c) => (
+                    <>
+                      <Age>{c}</Age>
+                    </>
+                  ))}
+                  <Time> Temps de l'exercice : {element.time} min</Time>
+                  <TrainingTitle>Type d'entrainement : </TrainingTitle>
+                  {element.typeTraining?.map((t) => (
+                    <>
+                      <Training>{t}</Training>
+                    </>
+                  ))}
 
-        <AmountContainer>
-          <p
-            styled={{ cursor: 'pointer' }}
-            width="1rem"
-            height="1rem"
-            viewBox="0 0 24 24"
-            onClick={(event) => {
-              event.stopPropagation();
-              handleQuantity('dec');
-            }}
-          >
-            -
-          </p>
-          <Amount style={{ width: '1rem', height: '1rem', margin: '10px' }}>
-            {orderTrainingPlane.some((exercice) => exercice._id === id)
-              ? orderTrainingPlane
-                  .filter((exercice) => exercice._id === id)
-                  .map((item) => item.quantity)
-              : quantity}
-          </Amount>
-          <p
-            styled={{ cursor: 'pointer' }}
-            width="1rem"
-            height="1rem"
-            viewBox="0 0 24 24"
-            onClick={(event) => {
-              event.stopPropagation();
-              handleQuantity('inc');
-            }}
-          >
-            +
-          </p>
-        </AmountContainer>
+                  {quantity > 0 && (
+                    <AmountContainer>
+                      <p
+                        styled={{ cursor: 'pointer' }}
+                        width="1rem"
+                        height="1rem"
+                        viewBox="0 0 24 24"
+                        onClick={(event) => {
+                          event.stopPropagation();
 
-        <ButtonContainer>
-          {!orderTrainingPlane.some((item) => item._id === id) ? (
-            <Button onClick={() => handleClickCart(id)}>
-              Ajouter au panier d'exercices{' '}
-            </Button>
-          ) : (
-            ''
-          )}
-          <Button onClick={onEditExercice}>Modifier Exercice</Button>
-          <Button onClick={onCancel}>Revenir aux exercices</Button>
-        </ButtonContainer>
-      </Wrapper>
+                          handleQuantity('dec');
+                        }}
+                      >
+                        -
+                      </p>
+                      <Amount
+                        style={{
+                          width: '1rem',
+                          height: '1rem',
+                          margin: '10px',
+                        }}
+                      >
+                        {quantity}
+                      </Amount>
+                      <p
+                        styled={{ cursor: 'pointer' }}
+                        width="1rem"
+                        height="1rem"
+                        viewBox="0 0 24 24"
+                        onClick={(event) => {
+                          event.stopPropagation();
+
+                          handleQuantity('inc');
+                        }}
+                      >
+                        +
+                      </p>
+                    </AmountContainer>
+                  )}
+
+                  <ButtonContainer>
+                    {quantity === 0 ? (
+                      <Button onClick={() => handleClickCart(id)}>
+                        Ajouter au panier d'exercices{' '}
+                      </Button>
+                    ) : (
+                      ''
+                    )}
+                    <Button onClick={onEditExercice}>Modifier Exercice</Button>
+                    <Button onClick={onCancel}>Revenir aux exercices</Button>
+                  </ButtonContainer>
+                </Wrapper>
+              </>
+            ))
+        : orderTrainingPlane
+            .filter((selectedEx) => selectedEx._id === id)
+            .map((element) => (
+              <>
+                <Image src={element.img} />
+                <Wrapper>
+                  <Title>{element.name}</Title>
+                  <Desc>{element.desc}</Desc>
+                  <AgeTitle>Catégories : </AgeTitle>
+                  {element.categoriesAge?.map((c) => (
+                    <>
+                      <Age>{c}</Age>
+                    </>
+                  ))}
+                  <Time> Temps de l'exercice : {element.time} min</Time>
+                  <TrainingTitle>Type d'entrainement : </TrainingTitle>
+                  {element.typeTraining?.map((t) => (
+                    <>
+                      <Training>{t}</Training>
+                    </>
+                  ))}
+
+                  {element.quantity > 0 && (
+                    <AmountContainer>
+                      <p
+                        styled={{ cursor: 'pointer' }}
+                        width="1rem"
+                        height="1rem"
+                        viewBox="0 0 24 24"
+                        onClick={(event) => {
+                          event.stopPropagation();
+
+                          handleQuantity('dec');
+                        }}
+                      >
+                        -
+                      </p>
+                      <Amount
+                        style={{
+                          width: '1rem',
+                          height: '1rem',
+                          margin: '10px',
+                        }}
+                      >
+                        {quantity}
+                      </Amount>
+                      <p
+                        styled={{ cursor: 'pointer' }}
+                        width="1rem"
+                        height="1rem"
+                        viewBox="0 0 24 24"
+                        onClick={(event) => {
+                          event.stopPropagation();
+
+                          handleQuantity('inc');
+                        }}
+                      >
+                        +
+                      </p>
+                    </AmountContainer>
+                  )}
+
+                  <ButtonContainer>
+                    {quantity === 0 ? (
+                      <Button onClick={() => handleClickCart(id)}>
+                        Ajouter au panier d'exercices{' '}
+                      </Button>
+                    ) : (
+                      ''
+                    )}
+                    <Button onClick={onEditExercice}>Modifier Exercice</Button>
+                    <Button onClick={onCancel}>Revenir aux exercices</Button>
+                  </ButtonContainer>
+                </Wrapper>
+              </>
+            ))}
+
       <Footer />
     </Container>
   );

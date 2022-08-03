@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useApp } from '../context/AppProvider';
 import Exercice from './Exercice';
 
 const Container = styled.div`
@@ -11,32 +12,18 @@ const Container = styled.div`
 `;
 
 const Excercices = ({ filters, sort }) => {
-  const [exercices, setExercices] = useState([]);
+  const { exercicesList, setExercicesList } = useApp();
   const [filteredExercices, setFilteredExercices] = useState([]);
- 
-
-  const getExercices = async () => {
-    try {
-      const res = await axios.get('http://localhost:8000/api/exercice');
-      setExercices(res.data);
-    } catch (err) {}
-  };
 
   useEffect(() => {
-    getExercices();
-  }, []);
-
-  useEffect(() => {
-      setFilteredExercices(
-        exercices.filter((item) =>
-          Object.entries(filters).every(([key, value]) =>
-            item[key].includes(value)
-            
-          )
+    setFilteredExercices(
+      exercicesList.filter((item) =>
+        Object.entries(filters).every(([key, value]) =>
+          item[key].includes(value)
         )
-      );
-  }, [exercices, filters]);
-
+      )
+    );
+  }, [filters, exercicesList]);
 
   useEffect(() => {
     if (sort === 'newest') {
@@ -50,12 +37,16 @@ const Excercices = ({ filters, sort }) => {
     }
   }, [sort]);
 
-
-
   return (
     <Container>
       {filteredExercices.map((item) => (
-        <Exercice item={item} key={item._id} getExercices={getExercices} filteredExercices={filteredExercices} />
+        <Exercice
+          item={item}
+          key={item._id}
+          exercicesList={exercicesList}
+          setExercicesList={setExercicesList}
+          filteredExercices={filteredExercices}
+        />
       ))}
     </Container>
   );

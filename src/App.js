@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import CartExercices from './components/CartExercices';
-import CreationExercices from './components/CreationExercices';
+import CreateNewExercice from './components/CreateNewExercice';
 import DetailsExercice from './components/DetailsExercice';
 import Disconnect from './components/Disconnect';
 import EditExercices from './components/EditExercices';
@@ -25,7 +25,7 @@ const App = () => {
             <Route path="/" element={<PageOutlet />}>
             <Route path="/disconnect" element={<Disconnect />} />
             <Route path="/exercices" element={<ExercicesList />} />
-            <Route path="/creationExercices" element={<CreationExercices />} />
+            <Route path="/createNew" element={<CreateNewExercice />} />
             <Route path="/exercices/:id" element={<DetailsExercice />} />
             <Route path="/exercices/:id/modifie" element={<EditExercices />} />
             <Route path="/panierExercices" element={<CartExercices />} />

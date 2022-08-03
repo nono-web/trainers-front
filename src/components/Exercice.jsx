@@ -47,9 +47,14 @@ const Icon = styled.img`
   cursor: pointer;
 `;
 
-const Exercice = ({ item, getExercices, filteredExercices }) => {
+const Exercice = ({
+  item,
+  exercicesList,
+  setExercicesList,
+  filteredExercices,
+}) => {
   const navigator = useNavigate();
-  const { coach, favoritesExercicesList } = useApp();
+  const { coach, favoritesExercicesList, setfavoritesExercicesList } = useApp();
 
   const onSearch = () => {
     navigator(`/exercices/${item._id}`);
@@ -59,14 +64,37 @@ const Exercice = ({ item, getExercices, filteredExercices }) => {
     navigator(`/exercices/${item._id}/modifie`);
   };
 
-  const handleReset = async (_id) => {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/api/exercice/${_id}`, [
-      _id,
-    ]);
-    getExercices();
+  const refreshExercicesList = async () => {
+    try {
+      const res = await axios.get('http://localhost:8000/api/exercice');
+      setExercicesList(res.data);
+    } catch (err) {}
   };
 
-  useEffect(() => {}, []);
+  const refreshFavoriteExList = async () => {
+    try {
+      await axios
+        .get(
+          `${process.env.REACT_APP_API_URL}/api/coach/favoritesExList/${coach._id}`
+        )
+        .then(({ data }) => {
+          console.log('refreshed favorite list', data);
+          setfavoritesExercicesList([...data]);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleReset = async (_id) => {
+    const { response } = await axios.delete(
+      `${process.env.REACT_APP_API_URL}/api/exercice/${_id}`,
+      [_id]
+    );
+    alert(`${response.name} have been removed`);
+    console.log('removed element dat back', response.name);
+    // exercicesList();
+  };
 
   const handleAddFavorite = async (itemId) => {
     console.log('favoritesExercicesList', favoritesExercicesList);
@@ -80,14 +108,14 @@ const Exercice = ({ item, getExercices, filteredExercices }) => {
         )
         .then(({ data }) => {
           console.log('favoriteExerciceId', data.response);
-
-          favoritesExercicesList.push(data.response);
+          !favoritesExercicesList?.includes(itemId) &&
+            favoritesExercicesList.push(data.response);
           localStorage.setItem(
             'favoritesExercicesList',
             JSON.stringify(favoritesExercicesList)
           );
-          getExercices();
 
+          refreshFavoriteExList();
           alert(`New Favorites Exercices added`);
         });
     } catch (err) {
@@ -105,20 +133,18 @@ const Exercice = ({ item, getExercices, filteredExercices }) => {
           }
         )
         .then(({ data }) => {
-          console.log('favoriteExerciceId to remove', data.response);
-          const removeIndex = favoritesExercicesList.indexOf(data.response);
-          favoritesExercicesList.splice(removeIndex, 1);
-          localStorage.setItem(
-            'favoritesExercicesList',
-            JSON.stringify(favoritesExercicesList)
-          );
-          getExercices();
-          alert(`exercices delete`);
+          refreshFavoriteExList();
+          alert(`favorite list updated`);
         });
     } catch (err) {
       console.log(err);
     }
   };
+
+  useEffect(() => {
+    refreshExercicesList();
+    console.log("favoritesExercicesList?.includes(item._id)",favoritesExercicesList?.includes(item._id))
+  }, []);
 
   return (
     <Container>

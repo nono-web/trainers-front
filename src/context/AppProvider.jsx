@@ -1,8 +1,10 @@
+import axios from 'axios';
 import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 
 const AppContext = createContext(null);
 
 const AppProvider = ({ children }) => {
+  const [exercicesList, setExercicesList] = useState([]);
   const [orderTrainingPlane, setOrderTrainingPlane] = useState(
     localStorage.getItem('orderTrainingPlane')
       ? JSON.parse(localStorage.getItem('orderTrainingPlane'))
@@ -41,10 +43,21 @@ const AppProvider = ({ children }) => {
 
   useEffect(() => {
     if (orderTrainingPlane) {
-      localStorage.setItem('orderTrainingPlane', JSON.stringify(orderTrainingPlane));
+      localStorage.setItem(
+        'orderTrainingPlane',
+        JSON.stringify(orderTrainingPlane)
+      );
     } else {
       localStorage.removeItem('orderTrainingPlane');
     }
+
+    const getAllExercices = async () => {
+      try {
+        const res = await axios.get('http://localhost:8000/api/exercice');
+        setExercicesList(res.data);
+      } catch (err) {}
+    };
+    getAllExercices();
   }, [orderTrainingPlane]);
 
   const AppStates = useMemo(
@@ -55,8 +68,10 @@ const AppProvider = ({ children }) => {
       setOrderTrainingPlane,
       favoritesExercicesList,
       setfavoritesExercicesList,
+      exercicesList,
+      setExercicesList,
     }),
-    [coach, favoritesExercicesList, orderTrainingPlane]
+    [coach, favoritesExercicesList, orderTrainingPlane, exercicesList]
   );
 
   return (

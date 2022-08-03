@@ -82,7 +82,7 @@ const Footer = () => {
     {
       title: 'Creer Exercice',
       logo: create,
-      link: '/creationExercices',
+      link: '/createNew',
     },
     {
       title: 'Profil',
