@@ -1,14 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import terrain from '../assets/terrain-de-football.png';
-import entrainement from '../assets/entrainement.png';
-import entraineur from '../assets/entraineur.png';
-import disconnect from '../assets/sortir.png';
-import create from '../assets/coup-franc.png';
+import coachAdmin from '../../assets/entraineurAdmin.png';
+import entrainement from '../../assets/entrainement.png';
+import entraineur from '../../assets/entraineur.png';
+import disconnect from '../../assets/sortir.png';
+import create from '../../assets/coup-franc.png';
 import { Link } from 'react-router-dom';
-import { desktop } from '../responsive';
-import { useApp } from '../context/AppProvider';
+import { desktop } from '../../responsive';
+import { useApp } from '../../context/AppProvider';
 
 const Container = styled.div`
   background: linear-gradient(
@@ -53,18 +53,18 @@ const Title = styled.a`
   ${desktop({ fontSize: '1rem' })}
 `;
 
-const Footer = () => {
+const FooterAdmin = () => {
   const { coach } = useApp();
   const footerLinks = [
     {
-      title: "Panier d'exercices",
-      logo: terrain,
-      link: `/panierExercices/${coach._id}`,
+      title: "Tout les entraineurs",
+      logo: coachAdmin,
+      link: `/coach`,
     },
     {
       title: 'Entrainement',
       logo: entrainement,
-      link: `/entrainements/${coach._id}`,
+      link: `/entrainementsAdmin`,
     },
     {
       title: 'Creer Exercice',
@@ -96,4 +96,4 @@ const Footer = () => {
   );
 };
 
-export default Footer;
+export default FooterAdmin;

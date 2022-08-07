@@ -1,50 +1,91 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { desktop } from '../responsive';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import axios from 'axios';
+import { useNavigate, useParams } from 'react-router-dom';
+
+import { useApp } from '../context/AppProvider';
 import Header from './Header';
 import Footer from './Footer';
 
+
 const Container = styled.div`
   width: 100vw;
-  height: 100%;
-  background: url('https://cdn.pixabay.com/photo/2017/06/23/23/49/youth-2436343_960_720.jpg')
+  height: 200vh;
+  background: url('https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')
     center;
   background-size: cover;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
- 
+  ${desktop({ height: '100%'})}
 `;
 
 const Wrapper = styled.div`
-  display: flex;
-flex-direction: column;
-  align-items: center;
+  width: 18rem;
+  height: 73rem;
+  padding: 1.25rem;
+  margin-bottom: 5rem;
   background-color: white;
-  padding: 0.5rem;
-  margin: 2rem;
   border-radius: 2rem;
-  ${desktop({ margin: '2rem' })}
+  ${desktop({width:'49rem', marginBottom: '0rem', height: '39rem'})}
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 1rem;
+`;
+
+const FormContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 360px;
+  padding: 0.5rem;
 `;
 
 const Title = styled.h1`
-text-align:center;
+  font-size: 1.7rem;
+  font-weight: 300;
+  text-align: center;
 `;
 
+const Label = styled.label`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const DataProfil = styled.p `
+font-weight: bold;
+`
+
 const Input = styled.input`
+  flex: 1;
   width: 15rem;
+  margin: 0rem 0.7rem 0rem 0rem;
+  padding: 0.7rem;
   border-radius: 2rem;
+  border: solid 1px var(--dark);
+  text-align:center;
   &::placeholder {
     text-align: center;
   }
+  ${desktop({width: '20rem'})}
 `;
 
+const DisplayPassword = styled.div ``
+
 const ButtonContainer = styled.div`
-  margin-top: 0.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -56,6 +97,7 @@ const Button = styled.button`
   border: none;
   border-radius: 1.2rem;
   padding: 1rem 1.2rem;
+  margin-top: 0.5rem;
   margin-bottom: 1rem;
   color: var(--dark);
   background-color: var(--green);
@@ -66,7 +108,7 @@ const Button = styled.button`
     cursor: pointer;
   }
   &:nth-child(2) {
-    background-color: var(--light-orange);
+    background-color: var(--light-orange)
   }
   &:hover:nth-child(2) {
     background-color: var(--yellow);
@@ -76,29 +118,76 @@ const Button = styled.button`
   ${desktop({ margin: '1rem ', width: '20rem' })}
 `;
 
-const Warning = styled.p `
-color: red;
-font-size: 1.5rem;
-margin: 0.5rem;
+const ErrorYup = styled.p `
+color: tomato;
 text-align:center;
+font-size: 0.9rem;
+&::before {
+  display: inline;
+  content: '⚠';
+}
+${desktop({ fontSize:'1.1rem'})}
+
 `
 
 const ProfilCoach = () => {
-  const { id } = useParams();
-  const navigator = useNavigate();
-  const onCancel = () => navigator('/exercices');
+    const [profil, setProfil] = useState([]);
+    const [checked, setChecked] = useState(false);
+    const navigator = useNavigate();
+    const { id } = useParams();
+    const { setCoach, coach } = useApp();
+    
 
-  const [profil, setProfil] = useState([]);
-  const [firstname, setFirsname] = useState(null);
-  const [lastname, setLastname] = useState(null);
-  const [username, setUsername] = useState(null);
-  const [email, setEmail] = useState(null);
-  const [password, setPassword] = useState(null);
-  const [club, setClub] = useState(null);
-  const [phoneNumber, setPhoneNumber] = useState(null);
+  const schema = yup
+    .object({
+      firstname: yup
+        .string()
+        .max(50)
+        .required("Veuillez entrer votre prenom s'il vous plait"),
+      lastname: yup
+        .string()
+        .max(50)
+        .required("Veuillez entrer votre nom s'il vous plait"),
+      username: yup
+        .string()
+        .max(20)
+        .required("Veuillez entrer votre identifiant s'il vous plait"),
+      email: yup
+        .string()
+        .email('Merci de rentrer un email valide')
+        .max(255)
+        .required('Merci de rentrer un email valide'),
+      password: yup
+        .string()
+        .max(255)
+        .required("Veuillez entrer votre mot de passe s'il vous plait"),
+      controlpassword: yup
+        .string()
+        .oneOf(
+          [yup.ref('password'), null],
+          'Le mot de passe doit être identique'
+        ),
+      club: yup
+        .string()
+        .max(50)
+        .required("Veuillez entrer votre club s'il vous plait"),
+      phoneNumber: yup
+        .number()
+        .typeError('Veuillez rentrer un numero de numero de telephone valide')
+        .required("Veuillez entrer votre numero de téléphone s'il vous plait"),
+    })
+    .required();
+
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
   
-
-  useEffect(() => {
+  
     const fetchDataProfil = async () => {
       const res = await axios.get(
         `${process.env.REACT_APP_API_URL}/api/coach/${id}`
@@ -106,75 +195,141 @@ const ProfilCoach = () => {
       setProfil(res.data);
       console.log(res.data);
     };
+  
+  useEffect(() => {
     fetchDataProfil();
   }, [id]);
 
-  const handleChange = () => {
-    const values = {
-      firstname,
-      lastname,
-      username,
-      email,
-      password,
-      club,
-      phoneNumber
-    };
-    axios
-      .put(`${process.env.REACT_APP_API_URL}/api/coach/${id}`, values)
-      .then(({ data }) => {
-        console.log({
-          data,
-        });
-       return  alert("Votre profil a été modifié");
-      });
+  const onSubmit = async (values) => {
+    const {
+        firstname,
+        lastname,
+        username,
+        email,
+        password,
+        phoneNumber,
+        club,
+      } = values;
+      try {
+    const res =  await axios
+      .put(`${process.env.REACT_APP_API_URL}/api/coach/${id}`,  
+      {
+        firstname,
+        lastname,
+        username,
+        email,
+        password,
+        phoneNumber,
+        club,
+      },
+      )
+      setCoach({ ...coach, res});
+      alert("Votre profil a été modifié");
+       fetchDataProfil();
+      } catch (err) {
+        console.log(err)
+      };
   };
+
+
+  const onCancel = () => navigator(-1);
+
+  const handleChange = () => setChecked(!checked);
 
   return (
     <Container>
-      <Header />
+        <Header  />
       <Wrapper>
-        <Title>{profil.firstname}</Title>
-        <Input
-          type="text"
-          placeholder="Modifier votre nom"
-          onChange={(e) => setFirsname(e.target.value)}
-        />
-         <Title>{profil.lastname}</Title>
-        <Input
-          type="text"
-          placeholder="Modifier votre prenom"
-          onChange={(e) => setLastname(e.target.value)}
-        />
-            <Title>{profil.username}</Title>
-        <Input
-          type="text"
-          placeholder="Modifier votre pseudo"
-          onChange={(e) => setUsername(e.target.value)}
-        />
-            <Title>{profil.email}</Title>
-        <Input
-          type="text"
-          placeholder="Modifier votre email"
-          onChange={(e) => setEmail(e.target.value)}
-        />
-            <Title>{profil.club}</Title>
-        <Input
-          type="text"
-          placeholder="Modifier votre club"
-          onChange={(e) => setClub(e.target.value)}
-        />
-        <Title>{profil.phoneNumber}</Title>
-           <Input
-          type="text"
-          placeholder="Modifier votre numero de téléphone"
-          onChange={(e) => setPhoneNumber(e.target.value)}
-        />
-      
-        <Warning> ⚠ Tout les champs doivent étre remplis pour modifier l'exercice </Warning>
-        <ButtonContainer>
-          <Button onClick={handleChange}>Modifié l'exercice</Button>
-          <Button onClick={onCancel}>Revenir aux exercices</Button>
-        </ButtonContainer>
+        <Title>Modifier Votre Profil</Title>
+        <Form onSubmit={handleSubmit(onSubmit)}>
+          <FormContainer>
+          {errors.firstname && <ErrorYup>{errors.firstname.message}</ErrorYup>}
+            <Label>
+              {' '}
+              Nom* :
+              <DataProfil>{profil.firstname}</DataProfil>
+              <Input type="text" placeholder="Modidier votre Nom" name="firstname" {...register("firstname")} />
+            </Label>
+          </FormContainer>
+
+          <FormContainer>
+          {errors.lastname && <ErrorYup>{errors.lastname.message}</ErrorYup>}
+            <Label>
+              {' '}
+              Prenom *:
+              <DataProfil>{profil.lastname}</DataProfil>
+              <Input type="text"  name="lastname" placeholder="Modifier le Prénom"  {...register("lastname")} />
+            </Label>
+          </FormContainer>
+
+          <FormContainer>
+          {errors.username && <ErrorYup>{errors.username.message}</ErrorYup>}
+            <Label>
+              {' '}
+              Pseudo* :
+              <DataProfil>{profil.username}</DataProfil>
+              <Input type="text" name="username" placeholder="Modifier votre Pseudo" {...register("username")} />
+            </Label>
+          </FormContainer>
+
+          <FormContainer>
+          {errors.email && <ErrorYup>{errors.email.message}</ErrorYup>}
+            <Label>
+              {' '}
+              Email* :
+              <DataProfil>{profil.email}</DataProfil>
+              <Input type="text" name="email" placeholder="Modifier votre email" {...register("email")} />
+            </Label>
+          </FormContainer>
+
+          <FormContainer>
+          {errors.phoneNumber && <ErrorYup>{errors.phoneNumber.message}</ErrorYup>}
+            <Label>
+              {' '}
+              Numero de Téléphone * :
+              <DataProfil>{profil.phoneNumber}</DataProfil>
+              <Input type="text" name="phoneNumber " placeholder="Modidier votre numéro de téléphone" {...register("phoneNumber")}/>
+            </Label>
+          </FormContainer>
+
+          <FormContainer>
+          {errors.club && <ErrorYup>{errors.club.message}</ErrorYup>}
+            <Label>
+              {' '}
+              Nom du club *:
+              <DataProfil>{profil.club}</DataProfil>
+              <Input type="text" name="club" placeholder="Modifier votre club" {...register("club")} />
+            </Label>
+          </FormContainer>
+
+          <FormContainer>
+          {errors.password && <ErrorYup>{errors.password.message}</ErrorYup>}
+            <Label>
+              {' '}
+              mot de passe * :
+              <Input  name="password"  placeholder="mot de passe" type={checked ? 'text' : 'password'} {...register("password")}  />
+            </Label>
+          </FormContainer>
+
+          <FormContainer>
+          {errors.controlpassword && <ErrorYup>{errors.controlpassword.message}</ErrorYup>}
+            <Label>
+              {' '}
+              Confirmation de mot de passe * :
+              <Input  type={checked ? 'text' : 'password'} {...register("controlpassword")} placeholder="Confirmation de mot de passe" />
+            </Label>
+          </FormContainer>
+          <DisplayPassword>
+            <Label> Afficher le mot de passe
+                <Input  checked={checked}
+            onChange={handleChange} type="checkbox" />
+            </Label>
+          </DisplayPassword>
+          <ButtonContainer>
+          <Button>Modifier le Profil</Button>
+          <Button onClick={onCancel}>Précédent</Button>
+          </ButtonContainer>
+        </Form>
       </Wrapper>
       <Footer />
     </Container>

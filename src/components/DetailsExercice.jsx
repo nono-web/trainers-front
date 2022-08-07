@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { desktop } from '../responsive';
 import Header from './Header';
 import Footer from './Footer';
 import { useApp } from '../context/AppProvider';
+import FooterAdmin from './Admin/FooterAdmin';
 
 const Container = styled.div`
   width: 100vw;
@@ -65,6 +65,12 @@ const AmountContainer = styled.div`
   align-items: center;
   font-weight: 700;
   margin-top: 1rem;
+  cursor: pointer;
+`;
+
+const AmountSign = styled.p`
+  width: 1rem;
+  height: 1rem;
 `;
 
 const Amount = styled.span`
@@ -76,6 +82,7 @@ const Amount = styled.span`
   align-items: center;
   justify-content: center;
   margin: 0rem 0.4rem;
+  cursor: pointer;
 `;
 
 const ButtonContainer = styled.div`
@@ -122,27 +129,21 @@ const DetailsExercice = () => {
   const { id } = useParams();
   const navigator = useNavigate();
   const onCancel = () => navigator('/exercices');
+  const { coach } = useApp();
 
   const [selectedExercice, setSelectedExercice] = useState({});
   const [quantity, setQuantity] = useState(0);
-  const {
-    setOrderTrainingPlane,
-    orderTrainingPlane,
-    exercicesList,
-    setExercicesList,
-  } = useApp();
+  const { setOrderTrainingPlane, orderTrainingPlane, exercicesList } = useApp();
 
   const handleQuantity = (type) => {
     if (type === 'dec') {
       setQuantity((prevState) => prevState - 1);
 
       const newOrderTraining = orderTrainingPlane.map((item) => {
-        // 👇️ if id equals 2, update country property
         if (item._id === id) {
           return { ...item, quantity: (item.quantity -= 1) };
         }
 
-        // 👇️ otherwise return iteme as is
         return item;
       });
       setOrderTrainingPlane(newOrderTraining);
@@ -150,12 +151,10 @@ const DetailsExercice = () => {
       setQuantity((prevState) => prevState + 1);
 
       const newOrderTraining = orderTrainingPlane.map((item) => {
-        // 👇️ if id equals 2, update country property
         if (item._id === id) {
           return { ...item, quantity: (item.quantity += 1) };
         }
 
-        // 👇️ otherwise return itemect as is
         return item;
       });
       setOrderTrainingPlane(newOrderTraining);
@@ -189,22 +188,6 @@ const DetailsExercice = () => {
           setQuantity(item.quantity);
         });
 
-    // const fetchDataExerciceDetails = async () => {
-    //   const res = await axios.get(
-    //     `${process.env.REACT_APP_API_URL}/api/exercice/${id}`
-    //   );
-    //   setExercice(res.data);
-    //   // console.log(res.data);
-    // };
-
-    // fetchDataExerciceDetails();
-
-    // quantity === 0 &&
-    //   setOrderTrainingPlane(() =>
-    //     orderTrainingPlane.filter((item) => item._id !== id)
-    //   );
-
-    // orderTrainingPlane.some((item) => item._id !== id) && setQuantity(0);
     console.log('selectedId', id);
     console.log('orderTrainingPlane', orderTrainingPlane);
   }, [id, quantity, exercicesList, orderTrainingPlane]);
@@ -237,41 +220,23 @@ const DetailsExercice = () => {
 
                   {quantity > 0 && (
                     <AmountContainer>
-                      <p
-                        styled={{ cursor: 'pointer' }}
-                        width="1rem"
-                        height="1rem"
-                        viewBox="0 0 24 24"
+                      <AmountSign
                         onClick={(event) => {
                           event.stopPropagation();
-
                           handleQuantity('dec');
                         }}
                       >
                         -
-                      </p>
-                      <Amount
-                        style={{
-                          width: '1rem',
-                          height: '1rem',
-                          margin: '10px',
-                        }}
-                      >
-                        {quantity}
-                      </Amount>
-                      <p
-                        styled={{ cursor: 'pointer' }}
-                        width="1rem"
-                        height="1rem"
-                        viewBox="0 0 24 24"
+                      </AmountSign>
+                      <Amount>{quantity}</Amount>
+                      <AmountSign
                         onClick={(event) => {
                           event.stopPropagation();
-
                           handleQuantity('inc');
                         }}
                       >
                         +
-                      </p>
+                      </AmountSign>
                     </AmountContainer>
                   )}
 
@@ -313,41 +278,23 @@ const DetailsExercice = () => {
 
                   {element.quantity > 0 && (
                     <AmountContainer>
-                      <p
-                        styled={{ cursor: 'pointer' }}
-                        width="1rem"
-                        height="1rem"
-                        viewBox="0 0 24 24"
+                      <AmountSign
                         onClick={(event) => {
                           event.stopPropagation();
-
                           handleQuantity('dec');
                         }}
                       >
                         -
-                      </p>
-                      <Amount
-                        style={{
-                          width: '1rem',
-                          height: '1rem',
-                          margin: '10px',
-                        }}
-                      >
-                        {quantity}
-                      </Amount>
-                      <p
-                        styled={{ cursor: 'pointer' }}
-                        width="1rem"
-                        height="1rem"
-                        viewBox="0 0 24 24"
+                      </AmountSign>
+                      <Amount>{quantity}</Amount>
+                      <AmountSign
                         onClick={(event) => {
                           event.stopPropagation();
-
                           handleQuantity('inc');
                         }}
                       >
                         +
-                      </p>
+                      </AmountSign>
                     </AmountContainer>
                   )}
 
@@ -365,8 +312,7 @@ const DetailsExercice = () => {
                 </Wrapper>
               </>
             ))}
-
-      <Footer />
+      {coach.isAdmin ? <FooterAdmin /> : <Footer />}
     </Container>
   );
 };

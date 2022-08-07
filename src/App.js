@@ -5,6 +5,7 @@ import DetailsExercice from './components/DetailsExercice';
 import Disconnect from './components/Disconnect';
 import EditExercices from './components/EditExercices';
 import ExercicesList from './components/ExercicesList';
+import TrainingPlane from './components/TrainingPlane';
 
 import Home from './components/Home';
 import Login from './components/Login';
@@ -12,6 +13,8 @@ import PageOutlet from './components/PageOutlet';
 import ProfilCoach from './components/ProfilCoach';
 import Register from './components/Register';
 import AppProvider from './context/AppProvider';
+import TrainingPlaneDetails from './components/TrainingPlaneDetails';
+import AdminRoute from './components/Admin/AdminRoute';
 
 const App = () => {
   return (
@@ -19,18 +22,25 @@ const App = () => {
       <AppProvider>
         <Router>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route index element={<Home />} />
+            <Route path="/disconnect" element={<Disconnect />} />
             <Route path="/connexion" element={<Login />} />
             <Route path="/enregistrement" element={<Register />} />
             <Route path="/" element={<PageOutlet />}>
-            <Route path="/disconnect" element={<Disconnect />} />
-            <Route path="/exercices" element={<ExercicesList />} />
-            <Route path="/createNew" element={<CreateNewExercice />} />
-            <Route path="/exercices/:id" element={<DetailsExercice />} />
-            <Route path="/exercices/:id/modifie" element={<EditExercices />} />
-            <Route path="/panierExercices" element={<CartExercices />} />
-            <Route path="/profil/:id" element={<ProfilCoach />} />
+              <Route path="/exercices" element={<ExercicesList />} />
+              <Route path="/nouvelExercice" element={<CreateNewExercice />} />
+              <Route path="/exercices/:id" element={<DetailsExercice />} />
+              <Route
+                path="/exercices/:id/modifie"
+                element={<EditExercices />}
+              />
+              <Route path="/panierExercices/:id" element={<CartExercices />} />
+              <Route path="/profil/:id" element={<ProfilCoach />} />
+              <Route path="/entrainements/:coachId" element={<TrainingPlane />} />
+              <Route path="/entrainements/details/:id" element={<TrainingPlaneDetails />} />
             </Route>
+            <Route path="/" element={<AdminRoute />}>
+              </Route>
           </Routes>
         </Router>
       </AppProvider>

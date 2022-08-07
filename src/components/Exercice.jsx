@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect} from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -49,9 +49,8 @@ const Icon = styled.img`
 
 const Exercice = ({
   item,
-  exercicesList,
+  ExercicesList,
   setExercicesList,
-  filteredExercices,
 }) => {
   const navigator = useNavigate();
   const { coach, favoritesExercicesList, setfavoritesExercicesList } = useApp();
@@ -91,9 +90,9 @@ const Exercice = ({
       `${process.env.REACT_APP_API_URL}/api/exercice/${_id}`,
       [_id]
     );
+    refreshExercicesList()
     alert(`${response.name} have been removed`);
     console.log('removed element dat back', response.name);
-    // exercicesList();
   };
 
   const handleAddFavorite = async (itemId) => {
@@ -172,7 +171,7 @@ const Exercice = ({
                 e.stopPropagation();
               }}
             />
-          )}
+            )}
           <Icon src={poubelle} onClick={() => handleReset(item._id)} />
         </IconContainer>
       </ContainerExercice>

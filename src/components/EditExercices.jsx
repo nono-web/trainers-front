@@ -6,6 +6,8 @@ import styled from 'styled-components';
 import { desktop } from '../responsive';
 import Header from './Header';
 import Footer from './Footer';
+import FooterAdmin from './Admin/FooterAdmin';
+import { useApp } from '../context/AppProvider';
 
 const Container = styled.div`
   width: 100vw;
@@ -129,7 +131,7 @@ const EditExercices = () => {
   const { id } = useParams();
   const navigator = useNavigate();
   const onCancel = () => navigator('/exercices');
-
+  const { coach } = useApp();
   const [exercice, setExercice] = useState([]);
   const [desc, setDesc] = useState(null);
   const [time, setTime] = useState(null);
@@ -209,7 +211,7 @@ const EditExercices = () => {
           <Button onClick={onCancel}>Revenir aux exercices</Button>
         </ButtonContainer>
       </Wrapper>
-      <Footer />
+      {coach.isAdmin ? <FooterAdmin /> :  <Footer /> }
     </Container>
   );
 };

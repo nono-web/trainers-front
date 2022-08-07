@@ -5,6 +5,8 @@ import { desktop } from '../responsive';
 import Header from './Header';
 import Exercices from '../components/Excercices';
 import Footer from './Footer';
+import { useApp } from '../context/AppProvider';
+import FooterAdmin from './Admin/FooterAdmin';
 
 const Container = styled.div`
   width: 100vw;
@@ -61,6 +63,7 @@ const ExercicesList = () => {
  
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState('asc');
+  const { coach } = useApp();
 
 
   const handleFilters = (e) => {
@@ -108,7 +111,7 @@ const ExercicesList = () => {
         </Filter>
       </FilterContainer>
       <Exercices filters={filters} sort={sort}/>
-      <Footer />
+      {coach.isAdmin ? <FooterAdmin /> : <Footer />}
     </Container>
   );
 };

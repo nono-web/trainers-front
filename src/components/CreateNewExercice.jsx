@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 
 import Header from './Header';
 import Footer from './Footer';
+import FooterAdmin from './Admin/FooterAdmin';
 
 const Container = styled.div`
   width: 100vw;
@@ -38,7 +39,7 @@ const Wrapper = styled.div`
   margin-bottom: 5rem;
   background-color: white;
   border-radius: 2rem;
-  ${desktop({ width: '50rem', marginBottom: '3.2rem', height: '36rem' })}
+  ${desktop({ width: '50rem', height: '36rem' })}
 `;
 
 const Form = styled.form`
@@ -380,7 +381,7 @@ const CreateNewExercice = () => {
           </ButtonContainer>
         </Form>
       </Wrapper>
-      <Footer />
+      {coach.isAdmin ? <FooterAdmin /> :  <Footer /> }
     </Container>
   );
 };

@@ -1,15 +1,21 @@
 import styled from 'styled-components';
 import { desktop } from '../responsive';
+import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useApp } from '../context/AppProvider';
+import Header from './Header';
+import Footer from './Footer';
+
+import trash from '../assets/poubelle.png';
 
 const Container = styled.div`
   width: 100vw;
-  height: 100vh;
-  background: url('https://cdn.pixabay.com/photo/2022/03/08/15/44/boy-7056003_960_720.jpg')
+  height: 100%;
+  background: url('https://cdn.pixabay.com/photo/2014/10/14/20/24/ball-488701_960_720.jpg')
     center;
   background-size: cover;
+  ${desktop({ height: '100%' })}
 `;
 
 const Wrapper = styled.div`
@@ -19,6 +25,8 @@ const Wrapper = styled.div`
 const Title = styled.h1`
   font-weight: 300;
   text-align: center;
+  color: white;
+  ${desktop({ fontSize: '3rem' })}
 `;
 
 const Top = styled.div`
@@ -29,41 +37,101 @@ const Top = styled.div`
 `;
 
 const TopButton = styled.button`
-  padding: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: 2rem;
-  background-color: white;
-  border: 1px solid teal;
-  background-color: white;
-  color: black;
+  width: 15rem;
+  border: none;
+  border-radius: 1.2rem;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1rem;
+  color: var(--dark);
+  background-color: var(--dark-green);
+  transition: all 0.2s ease-out;
   &:hover {
-    background-color: ${(props) =>
-      props.type === 'filled' ? 'green' : '#fef3ed'};
-    color: ${(props) => (props.type === 'filled' ? 'white' : ' black')};
+    background-color: var(--light-green);
+    color: var(--dark-green);
+    cursor: pointer;
   }
+  &:nth-child(2) {
+    background-color: var(--light-orange);
+    margin-left: 2rem;
+  }
+  &:hover:nth-child(2) {
+    background-color: var(--yellow);
+    color: var(--orange);
+    cursor: pointer;
+  }
+  ${desktop({ margin: '1rem ', width: '20rem' })}
 `;
 
 const Bottom = styled.div`
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
+  ${desktop({ flexDirection: 'row' })}
 `;
+const InputContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+  ${desktop({ flexDirection: 'row' })}
+`;
+
+const Input = styled.input`
+  width: 70%;
+  margin: 0rem 0.7rem 0rem 0rem;
+  padding: 0.7rem;
+  border-radius: 2rem;
+  border: solid 1px var(--dark);
+  text-align: center;
+  &::placeholder {
+    text-align: center;
+  }
+  ${desktop({ width: '20rem' })}
+`;
+
+const Label = styled.label`
+  display: flex;
+  align-items: center;
+  margin: 0.5rem;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+`;
+
 const Info = styled.div`
   flex: 3;
+  background: linear-gradient(
+    rgba(255, 255, 255, 0.5),
+    rgba(255, 255, 255, 0.5)
+  );
+  border-radius: 2rem;
+  margin-bottom: 2rem;
 `;
 
-const Product = styled.div`
+const Exercice = styled.div`
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
+  ${desktop({ flexDirection: 'row' })}
 `;
 
-const ProductDetail = styled.div`
-  flex: 2;
+const ExerciceDetail = styled.div`
+  flex: 3;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  ${desktop({ flexDirection: 'row' })}
 `;
 
 const Image = styled.img`
   width: 12.5rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  margin-left: 1rem;
+  border-radius:2rem;
+  &:nth-child(1) {
+    margin-top: 1rem;
+  }
 `;
 
 const Details = styled.div`
@@ -71,23 +139,49 @@ const Details = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  align-items: center;
 `;
 
-const ProductName = styled.span``;
-
-const ProductId = styled.span``;
-
-const ProductColor = styled.div`
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 50%;
-  border: 1px solid teal;
-  background-color: ${(props) => props.color};
+const ExerciceName = styled.span`
+  font-size: 0.8rem;
+  margin: 0.2rem;
+  ${desktop({ fontSize: '1rem' })}
 `;
 
-const ProductSize = styled.span``;
+const ExerciceId = styled.span`
+  font-size: 1rem;
+  margin: 0.2rem;
+`;
 
-const PriceDetail = styled.div`
+const ExerciceTimes = styled.span`
+  font-size: 1rem;
+  margin: 0.2rem;
+`;
+
+const TimeDetail = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+`;
+
+const ExerciceAmountContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.25rem;
+`;
+const ExerciceAmount = styled.div`
+  font-size: 1.6rem;
+  margin: 0.3rem;
+`;
+const ExerciceTime = styled.div`
+  font-size: 2rem;
+  font-weight: 200;
+`;
+
+const ContainerImgTrash = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -95,44 +189,30 @@ const PriceDetail = styled.div`
   justify-content: center;
 `;
 
-const ProductAmountContainer = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 1.25rem;
-`;
-const ProductAmount = styled.div`
-  font-size: 1.6rem;
-  margin: 0.3rem;
-`;
-const ProductPrice = styled.div`
-  font-size: 2rem;
-  font-weight: 200;
-`;
-
-const Hr = styled.hr`
-  background-color: #eee;
-  border: none;
-  height: 2px;
+const ImageTrash = styled.img`
+  width: 3rem;
+  height: 3rem;
 `;
 
 const Summary = styled.div`
+  background-color: white;
   flex: 1;
   border: 0.5px solid lightgray;
   border-radius: 2rem;
   padding: 1.25rem;
-  height: 50vh;
+  height: 40vh;
+  ${desktop({ marginLeft: '1rem' })}
 `;
 
 const SummaryTitle = styled.h1`
   font-weight: 200;
+  text-align: center;
 `;
 
 const SummaryItem = styled.div`
   margin: 2rem 0rem;
   display: flex;
   justify-content: space-between;
-  font-weight: ${(props) => props.type === 'total' && '500'};
-  font-size: ${(props) => props.type === 'total' && '1.6rem'};
 `;
 
 const SummaryItemText = styled.span``;
@@ -141,116 +221,159 @@ const SummaryItemPrice = styled.span``;
 
 const SummaryButton = styled.button`
   width: 100%;
-  padding: 0.7rem;
-  background-color: white;
-  color: black;
-  border-radius: 2rem;
-  font-weight: 600;
-  border: 1px solid teal;
+  border: none;
+  border-radius: 1.2rem;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1rem;
+  color: var(--dark);
+  background-color: var(--green);
+  transition: all 0.2s ease-out;
   &:hover {
-    background-color: green;
-    color: white;
+    background-color: var(--light-green);
+    color: var(--dark-green);
+    cursor: pointer;
   }
 `;
 
 const CartExercices = () => {
+  const [trainingName, setTrainingName] = useState(null);
   const navigator = useNavigate();
-  const { orderTrainingPlane } = useApp();
+  const { id } = useParams();
+  const { orderTrainingPlane, coach } = useApp();
   console.log(orderTrainingPlane);
+
+  const total_quantity = orderTrainingPlane
+    .map((item) => {
+      return item.quantity;
+    })
+    .reduce((acc, value) => {
+      return acc + value;
+    }, 0);
+  console.log('Le total est', total_quantity); // 20
+
+  const total_time = orderTrainingPlane
+    .map((item) => {
+      return item.time * item.quantity;
+    })
+    .reduce((acc, value) => {
+      return acc + value;
+    }, 0);
+
+  console.log('Le total est', total_time); // 20
+
+  const Time_Hours = (total_time / 60).toFixed(2);
+
+  const handlePrev = () => {
+    navigator(-1);
+  };
+  const handleExercices = () => {
+    navigator('/exercices');
+  };
+
+  const onSubmit = async () => {
+    const values = {
+      coachId: id,
+      trainingName,
+      exercices: orderTrainingPlane,
+      total_time,
+      nbTotal_exercices: total_quantity,
+    };
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/trainingPlane`,
+        values
+      );
+      alert("L'entrainement est Prêt");
+      localStorage.removeItem('orderTrainingPlane');
+      navigator(`/entrainements/${values.coachId}`);
+    } catch (err) {
+      console.log(err.response.data);
+    }
+  };
 
   return (
     <Container>
+      <Header />
       <Wrapper>
-        <Title>Votre Panier</Title>
+        <Title>Votre Panier d'éxercice</Title>
         <Top>
-          <TopButton>Continuer vos Achats</TopButton>
-          <TopButton type="filled">Payez Maintenant</TopButton>
+          <TopButton onClick={handlePrev}>Exercice Précédent</TopButton>
+          <TopButton onClick={handleExercices}>
+            Retourner sur les exercices
+          </TopButton>
         </Top>
+        <InputContainer>
+          <Label> Nom de l'entrainement (Obligatoire) :</Label>
+          <Input
+            type="text"
+            placeholder="Nom"
+            name="trainingName"
+            onChange={(e) => setTrainingName(e.target.value)}
+          />
+        </InputContainer>
         <Bottom>
-          {orderTrainingPlane.length > 0 &&
-            orderTrainingPlane.map((orders) => (
-              <>
-                <Info>
-                  <Product>
-                    <ProductDetail>
-                      <Image src={orders.img} />
+          <Info>
+            {orderTrainingPlane.length > 0 &&
+              orderTrainingPlane.map((orders) => (
+                <>
+                  <Exercice>
+                    <ExerciceDetail>
+                      <Image
+                        onClick={() => navigator(`/exercices/${orders._id}`)}
+                        src={orders.img}
+                      />
                       <Details>
-                        <ProductName>
-                          <b>Produit: </b> {orders.name}
-                        </ProductName>
-                        <ProductId>
+                        <ExerciceName>
+                          <b>Exercice : </b>
+                          {orders.name}
+                        </ExerciceName>
+                        <ExerciceId>
                           <b>ID: </b> {orders._id}
-                        </ProductId>
-                        <ProductColor
-                          color={orders.typeTraining}
-                        />
-                        <ProductSize>
-                          <b>Taille: </b>{' '}
-                          {orders.categoriesAge}
-                        </ProductSize>
+                        </ExerciceId>
+                        <ExerciceTimes>
+                          <b>Temps de l'exercice: </b> {orders.time} min
+                        </ExerciceTimes>
                       </Details>
-                    </ProductDetail>
-                    <PriceDetail>
-                      <ProductAmountContainer>
-                        <svg width="1em" height="1em" viewBox="0 0 24 24">
-                          <path
-                            fill="currentColor"
-                            d="M18 13H6c-.55 0-1-.45-1-1s.45-1 1-1h12c.55 0 1 .45 1 1s-.45 1-1 1z"
-                          ></path>
-                        </svg>
-                        <ProductAmount>
-                          {orders.quantity}
-                        </ProductAmount>
-                        <svg width="1em" height="1em" viewBox="0 0 24 24">
-                          <path
-                            fill="currentColor"
-                            d="M19 12.998h-6v6h-2v-6H5v-2h6v-6h2v6h6z"
-                          ></path>
-                        </svg>
-                      </ProductAmountContainer>
-                      <ProductPrice>
+                    </ExerciceDetail>
+                    <ContainerImgTrash>
+                      <ImageTrash src={trash} />
+                    </ContainerImgTrash>
+                    <TimeDetail>
+                      <ExerciceAmountContainer>
+                        <ExerciceAmount>
+                          Nb d'éxercices : {orders.quantity}
+                        </ExerciceAmount>
+                      </ExerciceAmountContainer>
+                      <ExerciceTime>
                         {' '}
-                        {orders.time *
-                          orders.quantity}
-                        €
-                      </ProductPrice>
-                    </PriceDetail>
-                  </Product>
-                  <Hr />
-                </Info>
-                
-              </>
-            ))}
-            <Summary>
-                  <SummaryTitle>Récapitulatif de la commande</SummaryTitle>
-                  <SummaryItem>
-                    <SummaryItemText>Total: </SummaryItemText>
-                    <SummaryItemPrice>
-                      {' '}
-                      {orderTrainingPlane.total}€
-                    </SummaryItemPrice>
-                  </SummaryItem>
-                  <SummaryItem>
-                    <SummaryItemText>Expédition Estimé :</SummaryItemText>
-                    <SummaryItemPrice> 5.90€</SummaryItemPrice>
-                  </SummaryItem>
-                  <SummaryItem>
-                    <SummaryItemText>
-                      Réduction sur les frais d’expédition
-                    </SummaryItemText>
-                    <SummaryItemPrice> -5.90€</SummaryItemPrice>
-                  </SummaryItem>
-                  <SummaryItem type="total">
-                    <SummaryItemText>Total: </SummaryItemText>
-                    <SummaryItemPrice>
-                      {' '}
-                      
-                    </SummaryItemPrice>
-                  </SummaryItem>
-                  <SummaryButton>Payez Maintenant</SummaryButton>
-                </Summary>
+                        {orders.time * orders.quantity} min
+                      </ExerciceTime>
+                    </TimeDetail>
+                  </Exercice>
+                </>
+              ))}
+          </Info>
+          <Summary>
+            <SummaryTitle>Récapitulatif de l'entrainement</SummaryTitle>
+            <SummaryItem>
+              <SummaryItemText>Nombre d'exercice : </SummaryItemText>
+              <SummaryItemPrice> {total_quantity}</SummaryItemPrice>
+            </SummaryItem>
+            <SummaryItem>
+              <SummaryItemText>Temps de l'entrainement :</SummaryItemText>
+              <SummaryItemPrice> {total_time} min</SummaryItemPrice>
+            </SummaryItem>
+            <SummaryItem>
+              <SummaryItemText>Soit :</SummaryItemText>
+              <SummaryItemPrice> {Time_Hours} h</SummaryItemPrice>
+            </SummaryItem>
+            <SummaryButton onClick={onSubmit}>
+              Commencer mon entrainement
+            </SummaryButton>
+          </Summary>
         </Bottom>
       </Wrapper>
+      <Footer />
     </Container>
   );
 };

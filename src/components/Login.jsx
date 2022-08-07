@@ -151,13 +151,13 @@ const Login = () => {
 
     try {
       const {
-        data: { isAdmin, favoritesExercices, id },
+        data: { isAdmin, favoritesExercices, id, username, lastname, firstname },
       } = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
         email,
         password,
       });
       console.log('login', isAdmin, favoritesExercices, id);
-      setCoach({ isAdmin: isAdmin, _id: id });
+      setCoach({ isAdmin: isAdmin, _id: id, username: username, lastname: lastname, firstname: firstname });
       setfavoritesExercicesList(favoritesExercices);
       return isAdmin ? navigator('/admin') : navigator('/exercices');
     } catch (err) {

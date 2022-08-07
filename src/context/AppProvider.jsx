@@ -5,6 +5,7 @@ const AppContext = createContext(null);
 
 const AppProvider = ({ children }) => {
   const [exercicesList, setExercicesList] = useState([]);
+
   const [orderTrainingPlane, setOrderTrainingPlane] = useState(
     localStorage.getItem('orderTrainingPlane')
       ? JSON.parse(localStorage.getItem('orderTrainingPlane'))
@@ -60,6 +61,8 @@ const AppProvider = ({ children }) => {
     getAllExercices();
   }, [orderTrainingPlane]);
 
+  
+
   const AppStates = useMemo(
     () => ({
       coach,
@@ -70,6 +73,7 @@ const AppProvider = ({ children }) => {
       setfavoritesExercicesList,
       exercicesList,
       setExercicesList,
+     
     }),
     [coach, favoritesExercicesList, orderTrainingPlane, exercicesList]
   );

@@ -5,7 +5,7 @@ import { useApp } from "../context/AppProvider";
 const PageOutlet = () => {
     const { coach } = useApp();
 
-    return coach
+    return coach._id
       ? (
         <>
           <Outlet />
