@@ -156,7 +156,8 @@ const Login = () => {
         email,
         password,
       });
-      console.log('login', isAdmin, favoritesExercices, id);
+      console.log('login isAdmin:', isAdmin);
+      console.log('login favex:', favoritesExercices);
       setCoach({ isAdmin: isAdmin, _id: id, username: username, lastname: lastname, firstname: firstname });
       setfavoritesExercicesList(favoritesExercices);
       return isAdmin ? navigator('/admin') : navigator('/exercices');

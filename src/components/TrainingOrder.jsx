@@ -3,6 +3,7 @@ import { desktop } from '../responsive';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useApp } from '../context/AppProvider';
 import Header from './Header';
 import Footer from './Footer';
@@ -128,7 +129,7 @@ const Image = styled.img`
   cursor: pointer;
   margin-bottom: 1rem;
   margin-left: 1rem;
-  border-radius:2rem;
+  border-radius: 2rem;
   &:nth-child(1) {
     margin-top: 1rem;
   }
@@ -235,12 +236,13 @@ const SummaryButton = styled.button`
   }
 `;
 
-const CartExercices = () => {
+
+
+const TrainingOrder = () => {
   const [trainingName, setTrainingName] = useState(null);
   const navigator = useNavigate();
   const { id } = useParams();
   const { orderTrainingPlane, coach } = useApp();
-  console.log(orderTrainingPlane);
 
   const total_quantity = orderTrainingPlane
     .map((item) => {
@@ -268,6 +270,24 @@ const CartExercices = () => {
   };
   const handleExercices = () => {
     navigator('/exercices');
+  };
+
+  const removeTrainingOrder = (id, name) => {
+    const updateTrainingOrder = JSON.parse(
+      localStorage.getItem('orderTrainingPlane')
+    );
+
+    localStorage.setItem(
+      'orderTrainingPlane',
+      JSON.stringify(
+        updateTrainingOrder
+          .filter((training) => training._id !== id)
+          .map((order) => order)
+      )
+    );
+
+    console.log(`order ${name} removed`);
+    alert(`order ${name} removed`);
   };
 
   const onSubmit = async () => {
@@ -327,16 +347,22 @@ const CartExercices = () => {
                           <b>Exercice : </b>
                           {orders.name}
                         </ExerciceName>
-                        <ExerciceId>
+                        {/* <ExerciceId>
                           <b>ID: </b> {orders._id}
-                        </ExerciceId>
+                        </ExerciceId> */}
                         <ExerciceTimes>
                           <b>Temps de l'exercice: </b> {orders.time} min
                         </ExerciceTimes>
                       </Details>
                     </ExerciceDetail>
                     <ContainerImgTrash>
-                      <ImageTrash src={trash} />
+                      {/* <ImageTrash src={trash} /> */}
+                      <DeleteIcon
+                        style={{ cursor: 'pointer' }}
+                        onClick={() =>
+                          removeTrainingOrder(orders._id, orders.name)
+                        }
+                      />
                     </ContainerImgTrash>
                     <TimeDetail>
                       <ExerciceAmountContainer>
@@ -378,4 +404,4 @@ const CartExercices = () => {
   );
 };
 
-export default CartExercices;
+export default TrainingOrder;

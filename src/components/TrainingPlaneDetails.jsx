@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useApp } from '../context/AppProvider';
+import {formatDate} from '../utils/formatDate'
 import axios from 'axios';
 import Footer from './Footer';
 import Header from './Header';
@@ -54,6 +55,7 @@ const ExercicesContainer = styled.div ``
 
 const TrainingPlaneDetails = () => {
   const [trainingPlaneDetails, setTrainingPlaneDetails] = useState([]);
+  const { exercicesList} = useApp();
   const navigator = useNavigate();
   const { id } = useParams();
 
@@ -70,6 +72,7 @@ const TrainingPlaneDetails = () => {
   useEffect(() => {
     getTrainingPlane();
   }, [id]);
+  console.log("trainingPlaneDetails",trainingPlaneDetails)
 
   return (
     <Container>
@@ -81,9 +84,10 @@ const TrainingPlaneDetails = () => {
             <TotalTime>Temps de l'entrainement total : {trainingPlaneDetails.total_time} min</TotalTime>
             <TotalQuantity>Nb d'exercices : {trainingPlaneDetails.nbTotal_exercices}</TotalQuantity>
         </TotalContainer>
-        <Date> Date de création :{trainingPlaneDetails.createdAt} </Date>
+        <Date> Date de création :{formatDate(trainingPlaneDetails.createdAt)} </Date>
         <ExercicesContainer>
-            <Title>{trainingPlaneDetails._id }</Title>
+        exercicesList
+            {/* <Title>{trainingPlaneDetails._id }</Title> */}
         </ExercicesContainer>
       </Wrapper>
       <Footer />

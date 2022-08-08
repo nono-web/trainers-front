@@ -126,13 +126,13 @@ const TrainingPlane = () => {
         `http://localhost:8000/api/trainingPlane/${coachId}`
       );
       setTrainingPlane(data);
-      console.log(trainingPlane);
     } catch (err) {}
   };
 
   useEffect(() => {
     fetchTrainingPlane();
   }, [coachId]);
+  console.log("trianingplane",trainingPlane)
 
   const handlePrev = () => {
     navigator(`/panierExercices/${coach._id}`);

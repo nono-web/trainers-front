@@ -57,17 +57,17 @@ const Footer = () => {
   const { coach } = useApp();
   const footerLinks = [
     {
-      title: "Panier d'exercices",
+      title: "Training order",
       logo: terrain,
       link: `/panierExercices/${coach._id}`,
     },
     {
-      title: 'Entrainement',
+      title: 'Trainings list',
       logo: entrainement,
       link: `/entrainements/${coach._id}`,
     },
     {
-      title: 'Creer Exercice',
+      title: 'Create exercice',
       logo: create,
       link: '/nouvelExercice',
     },
