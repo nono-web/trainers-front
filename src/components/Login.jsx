@@ -11,7 +11,7 @@ import { useApp } from '../context/AppProvider';
 import Header from './Header';
 
 const Container = styled.div`
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   background: url('https://images.pexels.com/photos/274506/pexels-photo-274506.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')
     center;
@@ -160,7 +160,7 @@ const Login = () => {
       console.log('login favex:', favoritesExercices);
       setCoach({ isAdmin: isAdmin, _id: id, username: username, lastname: lastname, firstname: firstname });
       setfavoritesExercicesList(favoritesExercices);
-      return isAdmin ? navigator('/admin') : navigator('/exercices');
+      return navigator('/exercices');
     } catch (err) {
       return setError(!error);
     }

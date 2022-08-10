@@ -10,11 +10,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useApp } from '../context/AppProvider';
 import Header from './Header';
 import Footer from './Footer';
+import FooterAdmin from './Admin/FooterAdmin';
 
 
 const Container = styled.div`
-  width: 100vw;
-  height: 200vh;
+  width: 100%;
+  height: 100%;
   background: url('https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')
     center;
   background-size: cover;
@@ -27,7 +28,7 @@ const Container = styled.div`
 
 const Wrapper = styled.div`
   width: 18rem;
-  height: 73rem;
+  height: 100%;
   padding: 1.25rem;
   margin-bottom: 5rem;
   background-color: white;
@@ -331,7 +332,7 @@ const ProfilCoach = () => {
           </ButtonContainer>
         </Form>
       </Wrapper>
-      <Footer />
+      {coach.isAdmin ? <FooterAdmin /> : <Footer />}
     </Container>
   );
 };

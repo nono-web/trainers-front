@@ -9,7 +9,7 @@ import { useApp } from '../context/AppProvider';
 import FooterAdmin from './Admin/FooterAdmin';
 
 const Container = styled.div`
-  width: 100vw;
+  width: 100%;
   height: 100%;
   background: url('https://cdn.pixabay.com/photo/2017/06/23/23/49/youth-2436343_960_720.jpg')
     center;
@@ -241,7 +241,7 @@ const DetailsExercice = () => {
                   )}
 
                   <ButtonContainer>
-                    {quantity === 0 ? (
+                    {coach.isAdmin === false && quantity === 0 ? (
                       <Button onClick={() => handleClickCart(id)}>
                         Ajouter au panier d'exercices{' '}
                       </Button>

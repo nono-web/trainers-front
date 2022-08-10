@@ -1,4 +1,4 @@
-import React, { useEffect} from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -47,13 +47,16 @@ const Icon = styled.img`
   cursor: pointer;
 `;
 
-const Exercice = ({
-  item,
-  ExercicesList,
-  setExercicesList,
-}) => {
+const Exercice = ({ item,  setExercicesList }) => {
+
   const navigator = useNavigate();
-  const { coach, favoritesExercicesList, setfavoritesExercicesList } = useApp();
+  const {
+    coach,
+    favoritesExercicesList,
+    setfavoritesExercicesList,
+    showFavorites,
+    exercicesList,
+  } = useApp();
 
   const onSearch = () => {
     navigator(`/exercices/${item._id}`);
@@ -90,7 +93,7 @@ const Exercice = ({
       `${process.env.REACT_APP_API_URL}/api/exercice/${_id}`,
       [_id]
     );
-    refreshExercicesList()
+    refreshExercicesList();
     alert(`${response.name} have been removed`);
     console.log('removed element dat back', response.name);
   };
@@ -142,39 +145,81 @@ const Exercice = ({
 
   useEffect(() => {
     refreshExercicesList();
-    console.log("favoritesExercicesList?.includes(item._id)",favoritesExercicesList?.includes(item._id))
+    console.log(
+      'favoritesExercicesList?.includes(item._id)',
+      favoritesExercicesList?.includes(item._id)
+    );
   }, []);
+
+  const filterFavorite = exercicesList.filter((planex) =>
+  favoritesExercicesList.find((ex) => planex._id === ex)
+);
+console.log('filterFavoris', filterFavorite);
 
   return (
     <Container>
-      <ContainerExercice>
-        <Image src={item.img} />
-        <Title> {item.name}</Title>
-        <Time>Temps de l'exercice : {item.time} min</Time>
-        <IconContainer>
-          <Icon src={search} onClick={onSearch} />
-          <Icon src={edit} onClick={onEdit} />
-          {favoritesExercicesList?.includes(item._id) && (
-            <Icon
-              src={heart}
-              onClick={(e) => {
-                handleRemoveFavorite(item._id);
-                e.stopPropagation();
-              }}
-            />
-          )}
-          {!favoritesExercicesList?.includes(item._id) && (
-            <Icon
-              src={heartVide}
-              onClick={(e) => {
-                handleAddFavorite(item._id);
-                e.stopPropagation();
-              }}
-            />
+      {showFavorites ? (
+        filterFavorite.length > 0 &&
+        filterFavorite.map((favorites) => (
+          <ContainerExercice>
+            <Image src={favorites.img} />
+            <Title> {favorites.name}</Title>
+            <Time>Temps de l'exercice : {favorites.time} min</Time>
+            <IconContainer>
+              <Icon src={search} onClick={onSearch} />
+              <Icon src={edit} onClick={onEdit} />
+              {favoritesExercicesList?.includes(item._id) && (
+                <Icon
+                  src={heart}
+                  onClick={(e) => {
+                    handleRemoveFavorite(item._id);
+                    e.stopPropagation();
+                  }}
+                />
+              )}
+              {!favoritesExercicesList?.includes(item._id) && (
+                <Icon
+                  src={heartVide}
+                  onClick={(e) => {
+                    handleAddFavorite(item._id);
+                    e.stopPropagation();
+                  }}
+                />
+              )}
+              <Icon src={poubelle} onClick={() => handleReset(item._id)} />
+            </IconContainer>
+          </ContainerExercice>
+        ))
+      ) : (
+        <ContainerExercice>
+          <Image src={item.img} />
+          <Title> {item.name}</Title>
+          <Time>Temps de l'exercice : {item.time} min</Time>
+          <IconContainer>
+            <Icon src={search} onClick={onSearch} />
+            <Icon src={edit} onClick={onEdit} />
+            {favoritesExercicesList?.includes(item._id) && (
+              <Icon
+                src={heart}
+                onClick={(e) => {
+                  handleRemoveFavorite(item._id);
+                  e.stopPropagation();
+                }}
+              />
             )}
-          <Icon src={poubelle} onClick={() => handleReset(item._id)} />
-        </IconContainer>
-      </ContainerExercice>
+            {!favoritesExercicesList?.includes(item._id) && (
+              <Icon
+                src={heartVide}
+                onClick={(e) => {
+                  handleAddFavorite(item._id);
+                  e.stopPropagation();
+                }}
+              />
+            )}
+            <Icon src={poubelle} onClick={() => handleReset(item._id)} />
+          </IconContainer>
+        </ContainerExercice>
+      )}
     </Container>
   );
 };

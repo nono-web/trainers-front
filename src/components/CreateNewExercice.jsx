@@ -20,8 +20,8 @@ import Footer from './Footer';
 import FooterAdmin from './Admin/FooterAdmin';
 
 const Container = styled.div`
-  width: 100vw;
-  height: 170vh;
+  width: 100%;
+  height: 100%;
   background: url('https://cdn.pixabay.com/photo/2016/11/29/07/06/bleachers-1867992_960_720.jpg')
     center;
   background-size: cover;
@@ -29,12 +29,11 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  ${desktop({ height: '100%' })}
 `;
 
 const Wrapper = styled.div`
   width: 17rem;
-  height: 75rem;
+  height: 100%;
   padding: 1.25rem;
   margin-bottom: 5rem;
   background-color: white;

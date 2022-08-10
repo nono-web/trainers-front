@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { desktop } from '../responsive';
+import { desktop } from '../../responsive';
 import axios from 'axios';
-import Footer from './Footer';
-import Header from './Header';
-import searchPlan from '../assets/search.png';
-import trash from '../assets/poubelle.png';
-import foot from '../assets/ballon-de-foot.png';
-import { useApp } from '../context/AppProvider';
-import { useNavigate, useParams, Link } from 'react-router-dom';
-import { formatDate } from '../utils/formatDate';
-import SearchBar from './SearchBar';
+import Header from '../Header';
+import searchPlan from '../../assets/search.png';
+import trash from '../../assets/poubelle.png';
+import foot from '../../assets/ballon-de-foot.png';
+import { useApp } from '../../context/AppProvider';
+import { useNavigate, Link } from 'react-router-dom';
+import { formatDate } from '../../utils/formatDate';
+import FooterAdmin from './FooterAdmin';
+import SearchBar from '../SearchBar';
+
 
 const Container = styled.div`
-  width: 100%;
+  width: 100vw;
   height: 100%;
   background: url('https://cdn.pixabay.com/photo/2014/10/14/20/24/ball-488701_960_720.jpg')
     center;
@@ -22,9 +23,10 @@ const Container = styled.div`
   flex-direction: column;
 `;
 const Title = styled.h1`
-  font-size: 3rem;
+  font-size: 2rem;
   text-align: center;
-  margin: 2rem 0rem;
+  margin: 1rem 0rem;
+  ${desktop({fontSize:'3rem' })}
 `;
 
 const Top = styled.div`
@@ -106,26 +108,42 @@ const Icon = styled.img`
     margin-right: 5rem;
   }
 `;
-const TrainingPlane = () => {
+const AdminTrainingPlane = () => {
   const { coach } = useApp();
-  const [trainingPlane, setTrainingPlane] = useState([]);
   const [search, setSearch] = useState('');
+  const [trainingPlane, setTrainingPlane] = useState([]);
+  const [allCoach, setAllCoach] = useState([]);
   const navigator = useNavigate();
-  const { coachId } = useParams();
 
   const fetchTrainingPlane = async () => {
     try {
       const { data } = await axios.get(
-        `http://localhost:8000/api/trainingPlane/${coachId}`
+        `${process.env.REACT_APP_API_URL}/api/trainingPlane`
       );
       setTrainingPlane(data);
     } catch (err) {}
   };
 
+  const fetchAllCoach = async () => {
+    try {
+      const { data } = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/coach`
+      );
+      setAllCoach(data);
+    } catch (err) {}
+  };
+
   useEffect(() => {
     fetchTrainingPlane();
-  }, [coachId]);
+    fetchAllCoach();
+  }, []);
   console.log('trianingplane', trainingPlane);
+  console.log('allCoach', allCoach);
+
+  const coachPlan = allCoach.filter((planex) =>
+    trainingPlane.find((ex) => planex._id === ex.coachId)
+  );
+  console.log('response1', coachPlan);
 
   const handlePrev = () => {
     navigator(`/panierExercices/${coach._id}`);
@@ -141,14 +159,11 @@ const TrainingPlane = () => {
     fetchTrainingPlane();
   };
 
-  /*   const handleSelectedTrainingDetails = (_id) => {
-    navigator(`/entrainements/details/${_id}`);
-  }; */
-
   return (
     <Container>
       <Header />
-      <Title> Tout vos entrainements</Title>
+      <Title> Tous les entrainements</Title>{' '}
+      <Title> Partie Administrateur</Title>
       <Top>
         <TopButton onClick={handlePrev}>
           Retourner sur le panier d'éxercices
@@ -164,7 +179,7 @@ const TrainingPlane = () => {
       </Top>
       <ContainerPlane>
         {trainingPlane.length > 0 &&
-          trainingPlane.filter((info) => {
+           trainingPlane.filter((info) => {
             console.log(info)
             if(search === "") {
               return info
@@ -175,12 +190,24 @@ const TrainingPlane = () => {
             <>
               <ContainerTrainingPlane key={training._id}>
                 <IconFoot src={foot} alt="foot" />
-                <Desc> <b>Entrainement : </b>{training.trainingName}</Desc>
+                {coachPlan.length > 0 &&
+                  coachPlan.map((coach) => (
+                    <Desc>
+                      <b>Entraineur : </b>
+                      {coach.lastname} {coach.firstname}
+                    </Desc>
+                  ))}
                 <Desc>
-                <b>Temps Total de l'entrainement : </b> {training.total_time} min
+                  {' '}
+                  <b>Entrainement : </b> {training.trainingName}
                 </Desc>
                 <Desc>
-                <b> Nb d'exercices : </b> {training.nbTotal_exercices}
+                  <b>Temps Total de l'entrainement : </b> {training.total_time}{' '}
+                  min
+                </Desc>
+                <Desc>
+                  <b> Nb d'exercices : </b>
+                  {training.nbTotal_exercices}
                 </Desc>
                 <Desc>
                   {' '}
@@ -199,9 +226,9 @@ const TrainingPlane = () => {
             </>
           ))}
       </ContainerPlane>
-      <Footer />
+      <FooterAdmin />
     </Container>
   );
 };
 
-export default TrainingPlane;
+export default AdminTrainingPlane;

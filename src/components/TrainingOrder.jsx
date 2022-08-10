@@ -1,14 +1,14 @@
 import styled from 'styled-components';
 import { desktop } from '../responsive';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useApp } from '../context/AppProvider';
 import Header from './Header';
 import Footer from './Footer';
 
-import trash from '../assets/poubelle.png';
+
 
 const Container = styled.div`
   width: 100vw;
@@ -149,11 +149,6 @@ const ExerciceName = styled.span`
   ${desktop({ fontSize: '1rem' })}
 `;
 
-const ExerciceId = styled.span`
-  font-size: 1rem;
-  margin: 0.2rem;
-`;
-
 const ExerciceTimes = styled.span`
   font-size: 1rem;
   margin: 0.2rem;
@@ -242,7 +237,7 @@ const TrainingOrder = () => {
   const [trainingName, setTrainingName] = useState(null);
   const navigator = useNavigate();
   const { id } = useParams();
-  const { orderTrainingPlane, coach } = useApp();
+  const { orderTrainingPlane } = useApp();
 
   const total_quantity = orderTrainingPlane
     .map((item) => {
@@ -273,7 +268,7 @@ const TrainingOrder = () => {
   };
 
   const removeTrainingOrder = (id, name) => {
-    const updateTrainingOrder = JSON.parse(
+   const updateTrainingOrder = JSON.parse(
       localStorage.getItem('orderTrainingPlane')
     );
 
@@ -285,7 +280,6 @@ const TrainingOrder = () => {
           .map((order) => order)
       )
     );
-
     console.log(`order ${name} removed`);
     alert(`order ${name} removed`);
   };
@@ -347,16 +341,12 @@ const TrainingOrder = () => {
                           <b>Exercice : </b>
                           {orders.name}
                         </ExerciceName>
-                        {/* <ExerciceId>
-                          <b>ID: </b> {orders._id}
-                        </ExerciceId> */}
                         <ExerciceTimes>
                           <b>Temps de l'exercice: </b> {orders.time} min
                         </ExerciceTimes>
                       </Details>
                     </ExerciceDetail>
                     <ContainerImgTrash>
-                      {/* <ImageTrash src={trash} /> */}
                       <DeleteIcon
                         style={{ cursor: 'pointer' }}
                         onClick={() =>

@@ -26,7 +26,7 @@ const Container = styled.div`
 
 const Wrapper = styled.div`
   width: 18rem;
-  height: 73rem;
+  height: 100%;
   padding: 1.25rem;
   margin-bottom: 5rem;
   background-color: white;

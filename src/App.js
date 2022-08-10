@@ -15,6 +15,8 @@ import Register from './components/Register';
 import AppProvider from './context/AppProvider';
 import TrainingPlaneDetails from './components/TrainingPlaneDetails';
 import AdminRoute from './components/Admin/AdminRoute';
+import AdminCoach from './components/Admin/AdminCoach';
+import AdminTrainingPlane from './components/Admin/AdminTrainingPlane';
 
 const App = () => {
   return (
@@ -40,6 +42,8 @@ const App = () => {
               <Route path="/entrainements/details/:id" element={<TrainingPlaneDetails />} />
             </Route>
             <Route path="/" element={<AdminRoute />}>
+            <Route path="/Admincoach" element={<AdminCoach />} />
+            <Route path="/AdminEntrainements" element={<AdminTrainingPlane />} />
               </Route>
           </Routes>
         </Router>

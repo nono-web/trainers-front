@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useApp } from '../context/AppProvider';
-import {formatDate} from '../utils/formatDate'
-import axios from 'axios';
+import { desktop } from '../responsive';
+import { formatDate } from '../utils/formatDate';
+import FooterAdmin from './Admin/FooterAdmin';
 import Footer from './Footer';
 import Header from './Header';
-
 
 const Container = styled.div`
   width: 100vw;
@@ -18,79 +18,191 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
+const Top = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem;
+`;
+
+const TopButton = styled.button`
+  width: 15rem;
+  border: none;
+  border-radius: 1.2rem;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1rem;
+  color: var(--dark);
+  background-color: var(--dark-green);
+  transition: all 0.2s ease-out;
+  &:hover {
+    background-color: var(--light-green);
+    color: var(--dark-green);
+    cursor: pointer;
+  }
+  &:nth-child(2) {
+    background-color: var(--light-orange);
+    margin-left: 2rem;
+  }
+  &:hover:nth-child(2) {
+    background-color: var(--yellow);
+    color: var(--orange);
+    cursor: pointer;
+  }
+  ${desktop({ margin: '1rem ', width: '20rem' })}
+`;
+
 const Wrapper = styled.div`
   background: linear-gradient(
     rgba(255, 255, 255, 0.5),
-    rgba(255, 255, 255, 1)
+    rgba(255, 255, 255, 0.6)
   );
-  margin: 3rem 10rem;
+  margin: 1rem;
+  border-radius: 2rem;
+  ${desktop({ margin: '1rem 15rem' })}
 `;
 const Title = styled.h1`
-text-align: center;
+  text-align: center;
+  margin-top: 1rem;
 `;
 
-const TotalContainer = styled.div `
-display: flex;
-justify-content: space-between;
-align-items: center;
-`
+const TotalContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  ${desktop({ flexDirection: 'row' })}
+`;
 
-const TotalTime = styled.p `
-margin: 1rem;
-font-weight: bold;
-`
+const TotalTime = styled.p`
+  margin: 1rem;
+  font-weight: bold;
+`;
 
+const TotalQuantity = styled.p`
+  margin: 1rem;
+  font-weight: bold;
+`;
 
-const TotalQuantity = styled.p `
-margin: 1rem;
-font-weight: bold;
-`
+const Date = styled.p`
+  margin: 1rem;
+  font-weight: bold;
+  text-align: center;
+`;
+const ExercicesContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
 
-const Date = styled.p `
-margin: 1rem;
-font-weight: bold;
-text-align: center;
-`
-const ExercicesContainer = styled.div ``
+const ContainerExercicesPlan = styled.div`
+  background-color: white;
+  padding: 1rem;
+  margin: 1rem;
+  border-radius: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  ${desktop({ margin: '2rem' })}
+`;
+
+const Image = styled.img`
+  width: 12rem;
+  height: 12rem;
+  cursor: pointer;
+`;
+
+const DescTitle = styled.p`
+margin-top: 1rem;
+  text-align: center;
+`;
+
+const Desc = styled.p`
+  text-align: center;
+  margin: 0.5rem;
+`;
 
 const TrainingPlaneDetails = () => {
-  const [trainingPlaneDetails, setTrainingPlaneDetails] = useState([]);
-  const { exercicesList} = useApp();
+  const location = useLocation();
+  const { data } = location.state;
+  const { exercicesList, coach } = useApp();
   const navigator = useNavigate();
-  const { id } = useParams();
+ 
 
-  const getTrainingPlane = async () => {
-    try {
-      const {data} = await axios.get(
-        `http://localhost:8000/api/trainingPlane/${id}/details`
-      );
-      setTrainingPlaneDetails(data)
-      console.log(trainingPlaneDetails)
-    } catch (err) {}
+  console.log('excerciceslist : ', exercicesList);
+  console.log('exercices planned', data.exercices);
+
+  const exercicesPlan = exercicesList.filter((planex) =>
+    data.exercices.find((ex) => planex._id === ex._id)
+  );
+  console.log('response1', exercicesPlan);
+
+  const quantityExercicesPlan = data.exercices.filter((planex) =>
+    exercicesPlan.find((ex) => planex._id === ex._id)
+  );
+  console.log('response2', quantityExercicesPlan);
+
+  const handlePrev = () => {
+    navigator(-1);
   };
-
-  useEffect(() => {
-    getTrainingPlane();
-  }, [id]);
-  console.log("trainingPlaneDetails",trainingPlaneDetails)
+  const handleExercices = () => {
+    navigator('/exercices');
+  };
 
   return (
     <Container>
       <Header />
+      <Top>
+        <TopButton onClick={handlePrev}>Precedent</TopButton>
+        <TopButton onClick={handleExercices}>
+          Retourner sur les exercices
+        </TopButton>
+      </Top>
       <Wrapper>
-        
-        <Title>{trainingPlaneDetails.trainingName}</Title>
+        <Title>{data.trainingName}</Title>
         <TotalContainer>
-            <TotalTime>Temps de l'entrainement total : {trainingPlaneDetails.total_time} min</TotalTime>
-            <TotalQuantity>Nb d'exercices : {trainingPlaneDetails.nbTotal_exercices}</TotalQuantity>
+          <TotalTime>
+            Temps de l'entrainement total : {data.total_time} min
+          </TotalTime>
+          <TotalQuantity>
+            Nb d'exercices : {data.nbTotal_exercices}
+          </TotalQuantity>
         </TotalContainer>
-        <Date> Date de création :{formatDate(trainingPlaneDetails.createdAt)} </Date>
+        <Date> Date de création : {formatDate(data.createdAt)} </Date>
         <ExercicesContainer>
-        exercicesList
-            {/* <Title>{trainingPlaneDetails._id }</Title> */}
+          {exercicesPlan.length > 0 &&
+            exercicesPlan.map((exercices) => (
+              <>
+                <ContainerExercicesPlan>
+                  <Image src={exercices.img} alt="training" />
+                  <DescTitle>
+                    <b>Titre de l'éxercice </b> :
+                  </DescTitle>
+                  <Desc> {exercices.name}</Desc>
+                  <DescTitle>
+                    <b>Description de l'exercice </b> :
+                  </DescTitle>
+                  <Desc> {exercices.desc}</Desc>
+                  <DescTitle>
+                    <b>Temps de l'exercice </b> :
+                  </DescTitle>
+                  <Desc> {exercices.time} min</Desc>
+                  <DescTitle>
+                    {' '}
+                    <b>Nombres d'éxercices : </b>{' '}
+                  </DescTitle>
+                  {quantityExercicesPlan.length > 0 &&
+                    quantityExercicesPlan.map((exercicesQuantity) =>
+                      exercicesQuantity._id === exercices._id ? (
+                        <Desc>{exercicesQuantity.quantity}</Desc>
+                      ) : (
+                        ''
+                      )
+                    )}
+                </ContainerExercicesPlan>
+              </>
+            ))}
         </ExercicesContainer>
       </Wrapper>
-      <Footer />
+      {coach.isAdmin ? <FooterAdmin /> :  <Footer /> }
     </Container>
   );
 };

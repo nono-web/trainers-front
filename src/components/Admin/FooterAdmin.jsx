@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import coachAdmin from '../../assets/entraineurAdmin.png';
 import entrainement from '../../assets/entrainement.png';
+import exercices from '../../assets/cones.png';
 import entraineur from '../../assets/entraineur.png';
 import disconnect from '../../assets/sortir.png';
 import create from '../../assets/coup-franc.png';
@@ -33,13 +34,13 @@ const LinkFooter = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: 14px;
+  font-size: 0.8rem;
   color: white;
 `;
 
 const Image = styled.img`
-  width: 3rem;
-  height: 3rem;
+  width: 2rem;
+  height: 2rem;
   margin-bottom: 0.3rem;
   margin-top: 0.5rem;
   ${desktop({ width: '5rem', height: '5rem' })}
@@ -48,7 +49,7 @@ const Image = styled.img`
 const Title = styled.a`
   margin: 0rem 0.5rem 0.7rem 0.5rem;
   text-decoration: none;
-  font-size: 0.8rem;
+  font-size: 0.6rem;
   text-align: center;
   ${desktop({ fontSize: '1rem' })}
 `;
@@ -57,17 +58,22 @@ const FooterAdmin = () => {
   const { coach } = useApp();
   const footerLinks = [
     {
-      title: "Tout les entraineurs",
+      title: "Entraineurs",
       logo: coachAdmin,
-      link: `/coach`,
+      link: `/Admincoach`,
     },
     {
-      title: 'Entrainement',
+      title: 'Entrainements',
       logo: entrainement,
-      link: `/entrainementsAdmin`,
+      link: `/Adminentrainements`,
     },
     {
-      title: 'Creer Exercice',
+      title: 'Exercices',
+      logo: exercices,
+      link: '/exercices',
+    },
+    {
+      title: 'Creer un Exercice',
       logo: create,
       link: '/nouvelExercice',
     },

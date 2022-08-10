@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 const Container = styled.div`
   background-image: url(${imgHome});
   height: 100vh;
-  width: 100vw;
+  width: 100%;
   background-size: cover;
   display: flex;
   flex-direction: column;

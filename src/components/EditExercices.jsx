@@ -10,7 +10,7 @@ import FooterAdmin from './Admin/FooterAdmin';
 import { useApp } from '../context/AppProvider';
 
 const Container = styled.div`
-  width: 100vw;
+  width: 100%;
   height: 100%;
   background: url('https://cdn.pixabay.com/photo/2017/06/23/23/49/youth-2436343_960_720.jpg')
     center;

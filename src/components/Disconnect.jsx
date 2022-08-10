@@ -8,7 +8,7 @@ const Disconnect = () => {
 
   const logout = async () => {
     await axios
-      .get(`${process.env.REACT_APP_API_URL}/api/logout`);
+      .get(`${process.env.REACT_APP_API_URL}/api/auth/logout`);
   };
   useEffect(() => {
     setCoach(null);

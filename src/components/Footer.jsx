@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import terrain from '../assets/terrain-de-football.png';
 import entrainement from '../assets/entrainement.png';
+import exercices from '../assets/cones.png';
 import entraineur from '../assets/entraineur.png';
 import disconnect from '../assets/sortir.png';
 import create from '../assets/coup-franc.png';
@@ -33,13 +34,13 @@ const LinkFooter = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: 14px;
+  font-size: 0.8rem;
   color: white;
 `;
 
 const Image = styled.img`
-  width: 3rem;
-  height: 3rem;
+  width: 2rem;
+  height: 2rem;
   margin-bottom: 0.3rem;
   margin-top: 0.5rem;
   ${desktop({ width: '5rem', height: '5rem' })}
@@ -48,7 +49,7 @@ const Image = styled.img`
 const Title = styled.a`
   margin: 0rem 0.5rem 0.7rem 0.5rem;
   text-decoration: none;
-  font-size: 0.8rem;
+  font-size: 0.6rem;
   text-align: center;
   ${desktop({ fontSize: '1rem' })}
 `;
@@ -57,19 +58,24 @@ const Footer = () => {
   const { coach } = useApp();
   const footerLinks = [
     {
-      title: "Training order",
+      title: "Panier d'exercices",
       logo: terrain,
       link: `/panierExercices/${coach._id}`,
     },
     {
-      title: 'Trainings list',
+      title: 'Entrainements',
       logo: entrainement,
       link: `/entrainements/${coach._id}`,
     },
     {
-      title: 'Create exercice',
+      title: 'Créer un exercice',
       logo: create,
       link: '/nouvelExercice',
+    },
+    {
+      title: 'Exercices',
+      logo: exercices,
+      link: '/exercices',
     },
     {
       title: 'Profil',

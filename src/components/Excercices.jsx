@@ -12,7 +12,7 @@ const Container = styled.div`
 `;
 
 const Excercices = ({ filters, sort }) => {
-  const { exercicesList, setExercicesList } = useApp();
+  const { exercicesList, setExercicesList, favoritesExercicesList } = useApp();
   const [filteredExercices, setFilteredExercices] = useState([]);
 
   useEffect(() => {
@@ -24,6 +24,9 @@ const Excercices = ({ filters, sort }) => {
       )
     );
   }, [filters, exercicesList]);
+
+  console.log(filteredExercices)
+  console.log(favoritesExercicesList)
 
   useEffect(() => {
     if (sort === 'newest') {
@@ -37,6 +40,10 @@ const Excercices = ({ filters, sort }) => {
     }
   }, [sort]);
 
+
+
+
+
   return (
     <Container>
       {filteredExercices.map((item) => (
@@ -46,6 +53,7 @@ const Excercices = ({ filters, sort }) => {
           exercicesList={exercicesList}
           setExercicesList={setExercicesList}
           filteredExercices={filteredExercices}
+         
         />
       ))}
     </Container>
