@@ -1,5 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
+
+import { desktop } from '../../responsive';
+import { useApp } from '../../context/AppProvider';
 
 import coachAdmin from '../../assets/entraineurAdmin.png';
 import entrainement from '../../assets/entrainement.png';
@@ -7,9 +11,8 @@ import exercices from '../../assets/cones.png';
 import entraineur from '../../assets/entraineur.png';
 import disconnect from '../../assets/sortir.png';
 import create from '../../assets/coup-franc.png';
-import { Link } from 'react-router-dom';
-import { desktop } from '../../responsive';
-import { useApp } from '../../context/AppProvider';
+
+
 
 const Container = styled.div`
   background: linear-gradient(
@@ -60,12 +63,12 @@ const FooterAdmin = () => {
     {
       title: "Entraineurs",
       logo: coachAdmin,
-      link: `/Admincoach`,
+      link: `/admin-entraineurs`,
     },
     {
       title: 'Entrainements',
       logo: entrainement,
-      link: `/Adminentrainements`,
+      link: `/admin-entrainements`,
     },
     {
       title: 'Exercices',
@@ -73,9 +76,9 @@ const FooterAdmin = () => {
       link: '/exercices',
     },
     {
-      title: 'Creer un Exercice',
+      title: 'Créer un éxercice',
       logo: create,
-      link: '/nouvelExercice',
+      link: '/nouvel-exercice',
     },
     {
       title: 'Profil',
@@ -85,7 +88,7 @@ const FooterAdmin = () => {
     {
       title: 'Deconnexion',
       logo: disconnect,
-      link: '/disconnect',
+      link: '/deconnexion',
     },
   ];
   return (

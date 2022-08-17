@@ -3,6 +3,10 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
 import { desktop } from '../responsive';
 import Header from './Header';
 import Footer from './Footer';
@@ -19,7 +23,22 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
- 
+`;
+
+const Form = styled.form`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 1rem;
+`;
+
+const Label = styled.label`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const Image = styled.img`
@@ -29,6 +48,7 @@ const Image = styled.img`
 `;
 
 const Wrapper = styled.div`
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -40,7 +60,7 @@ const Wrapper = styled.div`
 `;
 
 const Title = styled.h1`
-text-align:center;
+  text-align: center;
 `;
 
 const Desc = styled.p`
@@ -120,98 +140,148 @@ const Button = styled.button`
   ${desktop({ margin: '1rem ', width: '20rem' })}
 `;
 
-const Warning = styled.p `
-color: red;
-font-size: 1.5rem;
-margin: 0.5rem;
-text-align:center;
-`
+const ErrorYup = styled.p`
+  color: tomato;
+  text-align: center;
+  font-size: 0.7rem;
+  &::before {
+    display: inline;
+    content: '⚠';
+  }
+  ${desktop({ fontSize: '1rem' })}
+`;
 
 const EditExercices = () => {
   const { id } = useParams();
   const navigator = useNavigate();
-  const onCancel = () => navigator('/exercices');
   const { coach } = useApp();
   const [exercice, setExercice] = useState([]);
-  const [desc, setDesc] = useState(null);
-  const [time, setTime] = useState(null);
-  const [name, setName] = useState(null);
-  const [img, setImg] = useState(null);
+  const onCancel = () => navigator('/exercices');
+
+  const fetchDataExerciceDetails = async () => {
+    const res = await axios.get(
+      `${process.env.REACT_APP_API_URL}/api/exercice/${id}`
+    );
+    setExercice(res.data);
+    console.log(res.data);
+  };
 
   useEffect(() => {
-    const fetchDataExerciceDetails = async () => {
-      const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/exercice/${id}`
-      );
-      setExercice(res.data);
-      console.log(res.data);
-    };
     fetchDataExerciceDetails();
   }, [id]);
 
-  const handleChange = () => {
-    const values = {
-      desc,
-      time,
-      name,
-      img,
-    };
+  const schema = yup
+    .object({
+      name: yup
+        .string()
+        .max(50)
+        .required("Veuillez entrer le nom de l'exercice s'il vous plait"),
+      desc: yup
+        .string()
+        .max(1000)
+        .required(
+          "Veuillez entrer la description de l'exercice s'il vous plait"
+        ),
+      img: yup
+        .string()
+        .max(255)
+        .required("Veuillez mettre une image s'il vous plait"),
+      time: yup
+        .number()
+        .typeError("Veuillez rentrer une durée d'exercice valide")
+        .required(
+          "Veuillez entrer le temps que dure l'exercice s'il vous plait"
+        ),
+    })
+    .required();
+
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const onSubmit = (values) => {
+    const { name, desc, img, time } = values;
     axios
-      .put(`${process.env.REACT_APP_API_URL}/api/exercice/${id}`, values)
-      .then(({ data }) => {
-        console.log({
-          data,
-        });
-       return  navigator(`/exercices/${id}`);
+      .put(`${process.env.REACT_APP_API_URL}/api/exercice/${id}`, {
+        name,
+        desc,
+        img,
+        time,
+      })
+      .then(() => {
+        alert("L'éxercice a été modifié");
+        fetchDataExerciceDetails();
+        return navigator(`/exercices/${id}/modifie`);
       });
   };
 
   return (
     <Container>
       <Header />
+      <Form onSubmit={handleSubmit(onSubmit)}>
       <Image src={exercice.img} />
+      <Label> <b>Image de l'éxercices : </b>
       <Input
         type="text"
         placeholder="Modifier l'image de l'exercice"
-        onChange={(e) => setImg(e.target.value)}
+        name="img"
+        {...register('img')}
       />
-      <Wrapper>
-        <Title>{exercice.name}</Title>
-        <Input
-          type="text"
-          placeholder="Modifier le nom de l'exercice"
-          onChange={(e) => setName(e.target.value)}
-        />
-        <Desc>{exercice.desc}</Desc>
-        <Texterea
-          type="text"
-          rows="5"
-          cols="33"
-          name="desc"
-          placeholder="Modifier la description de l'exercice"
-          onChange={(e) => setDesc(e.target.value)}
-        />
-        <AgeTitle>Catégories : </AgeTitle>
-        {exercice.categoriesAge?.map((c) => (
-          <Age>{c}</Age>
-        ))}
-        <Time> Temps de l'exercice : {exercice.time} min</Time>
-        <Input
-          type="text"
-          placeholder="Modifier le temps de l'exercice"
-          onChange={(e) => setTime(e.target.value)}
-        />
-        <TrainingTitle>Type d'entrainement : </TrainingTitle>
-        {exercice.typeTraining?.map((t) => (
-          <Training>{t}</Training>
-        ))}
-        <Warning> ⚠ Tout les champs doivent étre remplis pour modifier l'exercice </Warning>
-        <ButtonContainer>
-          <Button onClick={handleChange}>Modifié l'exercice</Button>
-          <Button onClick={onCancel}>Revenir aux exercices</Button>
-        </ButtonContainer>
-      </Wrapper>
-      {coach.isAdmin ? <FooterAdmin /> :  <Footer /> }
+      </Label>
+      {errors.img && <ErrorYup>{errors.img.message}</ErrorYup>}
+  
+        <Wrapper>
+          <Title>{exercice.name}</Title>
+          <Label> <b>Nom de l'éxercice : </b>
+          <Input
+            type="text"
+            placeholder="Modifier le nom de l'exercice"
+            name="name"
+            {...register('name')}
+          />
+          </Label>
+          {errors.name && <ErrorYup>{errors.name.message}</ErrorYup>}
+          <Desc>{exercice.desc}</Desc>
+          <Label> <b>Description de l'éxercice : </b>
+          <Texterea
+            type="text"
+            rows="5"
+            cols="33"
+            name="desc"
+            placeholder="Modifier la description de l'exercice"
+            {...register('desc')}
+          />
+          </Label>
+          {errors.desc && <ErrorYup>{errors.desc.message}</ErrorYup>}
+          <AgeTitle>Catégories : </AgeTitle>
+          {exercice.categoriesAge?.map((c) => (
+            <Age>{c}</Age>
+          ))}
+          <Time> Temps de l'exercice : {exercice.time} min</Time>
+          <Label> <b>Temps de l'éxercice : </b>
+          <Input
+            type="text"
+            placeholder="Modifier le temps de l'exercice"
+            name="time"
+            {...register('time')}
+          />
+          </Label>
+          {errors.time && <ErrorYup>{errors.time.message}</ErrorYup>}
+          <TrainingTitle>Type d'entrainement : </TrainingTitle>
+          {exercice.typeTraining?.map((t) => (
+            <Training>{t}</Training>
+          ))}
+          <ButtonContainer>
+            <Button>Modifié l'exercice</Button>
+            <Button onClick={onCancel}>Revenir aux exercices</Button>
+          </ButtonContainer>
+        </Wrapper>
+      </Form>
+      {coach.isAdmin ? <FooterAdmin /> : <Footer />}
     </Container>
   );
 };

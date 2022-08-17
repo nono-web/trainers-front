@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+
 import { useApp } from '../context/AppProvider';
 import { desktop } from '../responsive';
 import { formatDate } from '../utils/formatDate';
@@ -126,20 +127,14 @@ const TrainingPlaneDetails = () => {
   const { exercicesList, coach } = useApp();
   const navigator = useNavigate();
  
-
-  console.log('excerciceslist : ', exercicesList);
-  console.log('exercices planned', data.exercices);
-
   const exercicesPlan = exercicesList.filter((planex) =>
     data.exercices.find((ex) => planex._id === ex._id)
   );
-  console.log('response1', exercicesPlan);
 
   const quantityExercicesPlan = data.exercices.filter((planex) =>
     exercicesPlan.find((ex) => planex._id === ex._id)
   );
-  console.log('response2', quantityExercicesPlan);
-
+ 
   const handlePrev = () => {
     navigator(-1);
   };

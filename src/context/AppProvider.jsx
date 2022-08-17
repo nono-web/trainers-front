@@ -54,7 +54,7 @@ const AppProvider = ({ children }) => {
 
     const getAllExercices = async () => {
       try {
-        const res = await axios.get('http://localhost:8000/api/exercice');
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/exercice`);
         setExercicesList(res.data);
       } catch (err) {}
     };

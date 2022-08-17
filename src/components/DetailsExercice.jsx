@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+
 import { desktop } from '../responsive';
 import Header from './Header';
 import Footer from './Footer';
@@ -128,12 +129,10 @@ const Button = styled.button`
 const DetailsExercice = () => {
   const { id } = useParams();
   const navigator = useNavigate();
-  const onCancel = () => navigator('/exercices');
-  const { coach } = useApp();
-
+  const { setOrderTrainingPlane, orderTrainingPlane, exercicesList, coach } = useApp();
   const [selectedExercice, setSelectedExercice] = useState({});
   const [quantity, setQuantity] = useState(0);
-  const { setOrderTrainingPlane, orderTrainingPlane, exercicesList } = useApp();
+  const onCancel = () => navigator('/exercices');
 
   const handleQuantity = (type) => {
     if (type === 'dec') {
@@ -165,7 +164,7 @@ const DetailsExercice = () => {
     navigator(`/exercices/${id}/modifie`);
   };
 
-  const handleClickCart = (id) => {
+  const handleClickCartExercice = () => {
     let newOrder = { ...selectedExercice, quantity: 1 };
     setOrderTrainingPlane(() => [...orderTrainingPlane, newOrder]);
     setQuantity((prevState) => (prevState += 1));
@@ -176,142 +175,73 @@ const DetailsExercice = () => {
       .filter((selectedEx) => selectedEx._id === id)
       .map((selectedEx) => setSelectedExercice(selectedEx));
 
-    console.log(
-      'selectedId is included in planOrderEx',
-      orderTrainingPlane.some((plannedEx) => plannedEx._id === id)
-    );
-
     orderTrainingPlane.some((plannedEx) => plannedEx._id === id) &&
       orderTrainingPlane
         .filter((element) => element._id === id)
         .map((item) => {
           setQuantity(item.quantity);
         });
-
-    console.log('selectedId', id);
-    console.log('orderTrainingPlane', orderTrainingPlane);
   }, [id, quantity, exercicesList, orderTrainingPlane]);
 
   return (
     <Container>
       <Header />
-      {!orderTrainingPlane.some((plannedEx) => plannedEx._id === id)
-        ? exercicesList
-            .filter((selectedEx) => selectedEx._id === id)
-            .map((element) => (
-              <>
-                <Image src={element.img} />
-                <Wrapper>
-                  <Title>{element.name}</Title>
-                  <Desc>{element.desc}</Desc>
-                  <AgeTitle>Catégories : </AgeTitle>
-                  {element.categoriesAge?.map((c) => (
-                    <>
-                      <Age>{c}</Age>
-                    </>
-                  ))}
-                  <Time> Temps de l'exercice : {element.time} min</Time>
-                  <TrainingTitle>Type d'entrainement : </TrainingTitle>
-                  {element.typeTraining?.map((t) => (
-                    <>
-                      <Training>{t}</Training>
-                    </>
-                  ))}
-
-                  {quantity > 0 && (
-                    <AmountContainer>
-                      <AmountSign
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleQuantity('dec');
-                        }}
-                      >
-                        -
-                      </AmountSign>
-                      <Amount>{quantity}</Amount>
-                      <AmountSign
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleQuantity('inc');
-                        }}
-                      >
-                        +
-                      </AmountSign>
-                    </AmountContainer>
-                  )}
-
-                  <ButtonContainer>
-                    {coach.isAdmin === false && quantity === 0 ? (
-                      <Button onClick={() => handleClickCart(id)}>
-                        Ajouter au panier d'exercices{' '}
-                      </Button>
-                    ) : (
-                      ''
-                    )}
-                    <Button onClick={onEditExercice}>Modifier Exercice</Button>
-                    <Button onClick={onCancel}>Revenir aux exercices</Button>
-                  </ButtonContainer>
-                </Wrapper>
-              </>
-            ))
-        : orderTrainingPlane
-            .filter((selectedEx) => selectedEx._id === id)
-            .map((element) => (
-              <>
-                <Image src={element.img} />
-                <Wrapper>
-                  <Title>{element.name}</Title>
-                  <Desc>{element.desc}</Desc>
-                  <AgeTitle>Catégories : </AgeTitle>
-                  {element.categoriesAge?.map((c) => (
-                    <>
-                      <Age>{c}</Age>
-                    </>
-                  ))}
-                  <Time> Temps de l'exercice : {element.time} min</Time>
-                  <TrainingTitle>Type d'entrainement : </TrainingTitle>
-                  {element.typeTraining?.map((t) => (
-                    <>
-                      <Training>{t}</Training>
-                    </>
-                  ))}
-
-                  {element.quantity > 0 && (
-                    <AmountContainer>
-                      <AmountSign
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleQuantity('dec');
-                        }}
-                      >
-                        -
-                      </AmountSign>
-                      <Amount>{quantity}</Amount>
-                      <AmountSign
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleQuantity('inc');
-                        }}
-                      >
-                        +
-                      </AmountSign>
-                    </AmountContainer>
-                  )}
-
-                  <ButtonContainer>
-                    {quantity === 0 ? (
-                      <Button onClick={() => handleClickCart(id)}>
-                        Ajouter au panier d'exercices{' '}
-                      </Button>
-                    ) : (
-                      ''
-                    )}
-                    <Button onClick={onEditExercice}>Modifier Exercice</Button>
-                    <Button onClick={onCancel}>Revenir aux exercices</Button>
-                  </ButtonContainer>
-                </Wrapper>
-              </>
-            ))}
+      {exercicesList 
+      .filter((selectedEx) => selectedEx._id === id)
+      .map((element) => (
+      <>
+        <Image src={element.img} />
+        <Wrapper>
+          <Title>{element.name}</Title>
+          <Desc>{element.desc}</Desc>
+          <AgeTitle>Catégories : </AgeTitle>
+          {element.categoriesAge?.map((c) => (
+            <>
+              <Age>{c}</Age>
+            </>
+          ))}
+          <Time> Temps de l'exercice : {element.time} min</Time>
+          <TrainingTitle>Type d'entrainement : </TrainingTitle>
+          {element.typeTraining?.map((t) => (
+            <>
+              <Training>{t}</Training>
+            </>
+          ))}
+          {quantity > 0 && (
+            <AmountContainer>
+              <AmountSign
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleQuantity('dec');
+                }}
+              >
+                -
+              </AmountSign>
+              <Amount>{quantity}</Amount>
+              <AmountSign
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleQuantity('inc');
+                }}
+              >
+                +
+              </AmountSign>
+            </AmountContainer>
+          )}
+          <ButtonContainer>
+            {coach.isAdmin === false && quantity === 0 ? (
+              <Button onClick={() => handleClickCartExercice(id)}>
+                Ajouter au panier d'exercices{' '}
+              </Button>
+            ) : (
+              ''
+            )}
+            <Button onClick={onEditExercice}>Modifier Exercice</Button>
+            <Button onClick={onCancel}>Revenir aux exercices</Button>
+          </ButtonContainer>
+        </Wrapper>
+        </>
+      ))}
       {coach.isAdmin ? <FooterAdmin /> : <Footer />}
     </Container>
   );

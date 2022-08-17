@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { desktop } from '../../responsive';
 import axios from 'axios';
-import Header from '../Header';
-import trash from '../../assets/poubelle.png';
-import coachs from '../../assets/entraineurAdmin.png';
-
 import { useNavigate } from 'react-router-dom';
+
+import { desktop } from '../../responsive';
+import Header from '../Header';
 import FooterAdmin from './FooterAdmin';
+import { formatDate } from '../../utils/formatDate';
+
+import trash from '../../assets/poubelle.png';
+import coaches from '../../assets/entraineurAdmin.png';
 
 const Container = styled.div`
   width: 100%;
@@ -59,8 +61,12 @@ const TopButton = styled.button`
 
 const ContainerCoach = styled.div`
   display: flex;
-  flex-direction: column;;
-  ${desktop({ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' })}
+  flex-direction: column;
+  ${desktop({
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  })}
 `;
 
 const ContainerAdminCoach = styled.div`
@@ -71,7 +77,7 @@ const ContainerAdminCoach = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  ${desktop({ margin: '2rem' })}
+  ${desktop({ margin: '2rem'})}
 `;
 
 const IconCoach = styled.img`
@@ -97,7 +103,9 @@ const AdminCoach = () => {
 
   const fetchAdminCoach = async () => {
     try {
-      const { data } = await axios.get(`http://localhost:8000/api/coach`);
+      const { data } = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/coach`
+      );
       setAdminCoach(data);
     } catch (err) {}
   };
@@ -121,7 +129,7 @@ const AdminCoach = () => {
   return (
     <Container>
       <Header />
-      <Title> Tout les Entraineurs</Title>
+      <Title> Tous les Entraineurs</Title>
       <Top>
         <TopButton onClick={handlePrev}>Précédent</TopButton>
         <TopButton onClick={handleExercices}>
@@ -133,7 +141,7 @@ const AdminCoach = () => {
           AdminCoach.map((coach) => (
             <>
               <ContainerAdminCoach key={coach._id}>
-                <IconCoach src={coachs} alt="foot" />
+                <IconCoach src={coaches} alt="foot" />
                 <Desc>
                   {' '}
                   Nom : <b>{coach.firstname}</b>
@@ -153,7 +161,10 @@ const AdminCoach = () => {
                 <Desc>
                   Club : <b>{coach.club}</b>
                 </Desc>
-
+                <Desc>
+                  {' '}
+                  Date de création : <b>{formatDate(coach.createdAt)}</b>{' '}
+                </Desc>
                 <Icon src={trash} onClick={() => handleReset(coach._id)} />
               </ContainerAdminCoach>
             </>

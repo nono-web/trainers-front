@@ -2,13 +2,16 @@ import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+
 import { desktop } from '../responsive';
-import poubelle from '../assets/poubelle.png';
+import { useApp } from '../context/AppProvider';
+
+import trash from '../assets/poubelle.png';
 import search from '../assets/search.png';
-import heartVide from '../assets/coeurVide.png';
+import emptyHeart from '../assets/coeurVide.png';
 import edit from '../assets/edit.png';
 import heart from '../assets/coeur.png';
-import { useApp } from '../context/AppProvider';
+
 
 const Container = styled.div``;
 
@@ -47,15 +50,12 @@ const Icon = styled.img`
   cursor: pointer;
 `;
 
-const Exercice = ({ item,  setExercicesList }) => {
-
+const Exercice = ({ item, setExercicesList,filteredExercices }) => {
   const navigator = useNavigate();
   const {
     coach,
     favoritesExercicesList,
     setfavoritesExercicesList,
-    showFavorites,
-    exercicesList,
   } = useApp();
 
   const onSearch = () => {
@@ -68,7 +68,7 @@ const Exercice = ({ item,  setExercicesList }) => {
 
   const refreshExercicesList = async () => {
     try {
-      const res = await axios.get('http://localhost:8000/api/exercice');
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/exercice`);
       setExercicesList(res.data);
     } catch (err) {}
   };
@@ -80,7 +80,6 @@ const Exercice = ({ item,  setExercicesList }) => {
           `${process.env.REACT_APP_API_URL}/api/coach/favoritesExList/${coach._id}`
         )
         .then(({ data }) => {
-          console.log('refreshed favorite list', data);
           setfavoritesExercicesList([...data]);
         });
     } catch (err) {
@@ -94,12 +93,10 @@ const Exercice = ({ item,  setExercicesList }) => {
       [_id]
     );
     refreshExercicesList();
-    alert(`${response.name} have been removed`);
-    console.log('removed element dat back', response.name);
   };
 
   const handleAddFavorite = async (itemId) => {
-    console.log('favoritesExercicesList', favoritesExercicesList);
+    
     try {
       await axios
         .post(
@@ -109,7 +106,6 @@ const Exercice = ({ item,  setExercicesList }) => {
           }
         )
         .then(({ data }) => {
-          console.log('favoriteExerciceId', data.response);
           !favoritesExercicesList?.includes(itemId) &&
             favoritesExercicesList.push(data.response);
           localStorage.setItem(
@@ -118,7 +114,6 @@ const Exercice = ({ item,  setExercicesList }) => {
           );
 
           refreshFavoriteExList();
-          alert(`New Favorites Exercices added`);
         });
     } catch (err) {
       console.log(err);
@@ -136,7 +131,6 @@ const Exercice = ({ item,  setExercicesList }) => {
         )
         .then(({ data }) => {
           refreshFavoriteExList();
-          alert(`favorite list updated`);
         });
     } catch (err) {
       console.log(err);
@@ -145,52 +139,12 @@ const Exercice = ({ item,  setExercicesList }) => {
 
   useEffect(() => {
     refreshExercicesList();
-    console.log(
-      'favoritesExercicesList?.includes(item._id)',
-      favoritesExercicesList?.includes(item._id)
-    );
   }, []);
 
-  const filterFavorite = exercicesList.filter((planex) =>
-  favoritesExercicesList.find((ex) => planex._id === ex)
-);
-console.log('filterFavoris', filterFavorite);
+  
 
   return (
     <Container>
-      {showFavorites ? (
-        filterFavorite.length > 0 &&
-        filterFavorite.map((favorites) => (
-          <ContainerExercice>
-            <Image src={favorites.img} />
-            <Title> {favorites.name}</Title>
-            <Time>Temps de l'exercice : {favorites.time} min</Time>
-            <IconContainer>
-              <Icon src={search} onClick={onSearch} />
-              <Icon src={edit} onClick={onEdit} />
-              {favoritesExercicesList?.includes(item._id) && (
-                <Icon
-                  src={heart}
-                  onClick={(e) => {
-                    handleRemoveFavorite(item._id);
-                    e.stopPropagation();
-                  }}
-                />
-              )}
-              {!favoritesExercicesList?.includes(item._id) && (
-                <Icon
-                  src={heartVide}
-                  onClick={(e) => {
-                    handleAddFavorite(item._id);
-                    e.stopPropagation();
-                  }}
-                />
-              )}
-              <Icon src={poubelle} onClick={() => handleReset(item._id)} />
-            </IconContainer>
-          </ContainerExercice>
-        ))
-      ) : (
         <ContainerExercice>
           <Image src={item.img} />
           <Title> {item.name}</Title>
@@ -209,17 +163,16 @@ console.log('filterFavoris', filterFavorite);
             )}
             {!favoritesExercicesList?.includes(item._id) && (
               <Icon
-                src={heartVide}
+                src={emptyHeart}
                 onClick={(e) => {
                   handleAddFavorite(item._id);
                   e.stopPropagation();
                 }}
               />
             )}
-            <Icon src={poubelle} onClick={() => handleReset(item._id)} />
+            <Icon src={trash} onClick={() => handleReset(item._id)} />
           </IconContainer>
         </ContainerExercice>
-      )}
     </Container>
   );
 };

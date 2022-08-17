@@ -1,10 +1,11 @@
 import React from 'react';
-import imgHome from '../assets/terrain3.jpg';
-
 import styled from 'styled-components';
-import logo from '../assets/logoTrainers8.png';
-import { desktop } from '../responsive';
 import { useNavigate } from 'react-router-dom';
+
+import { desktop } from '../responsive';
+
+import logo from '../assets/logoTrainers8.png';
+import imgHome from '../assets/terrain3.jpg';
 
 const Container = styled.div`
   background-image: url(${imgHome});

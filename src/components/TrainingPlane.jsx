@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { desktop } from '../responsive';
 import axios from 'axios';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+
+import { desktop } from '../responsive';
 import Footer from './Footer';
 import Header from './Header';
+import { formatDate } from '../utils/formatDate';
+import SearchBar from './SearchBar';
+import { useApp } from '../context/AppProvider';
+
 import searchPlan from '../assets/search.png';
 import trash from '../assets/poubelle.png';
 import foot from '../assets/ballon-de-foot.png';
-import { useApp } from '../context/AppProvider';
-import { useNavigate, useParams, Link } from 'react-router-dom';
-import { formatDate } from '../utils/formatDate';
-import SearchBar from './SearchBar';
 
 const Container = styled.div`
   width: 100%;
@@ -33,7 +35,7 @@ const Top = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 1.25rem;
-  ${desktop({flexDirection:'row'})}
+  ${desktop({ flexDirection: 'row' })}
 `;
 
 const TopButton = styled.button`
@@ -116,7 +118,7 @@ const TrainingPlane = () => {
   const fetchTrainingPlane = async () => {
     try {
       const { data } = await axios.get(
-        `http://localhost:8000/api/trainingPlane/${coachId}`
+        `${process.env.REACT_APP_API_URL}/api/trainingPlane/${coachId}`
       );
       setTrainingPlane(data);
     } catch (err) {}
@@ -125,8 +127,7 @@ const TrainingPlane = () => {
   useEffect(() => {
     fetchTrainingPlane();
   }, [coachId]);
-  console.log('trianingplane', trainingPlane);
-
+ 
   const handlePrev = () => {
     navigator(`/panierExercices/${coach._id}`);
   };
@@ -141,10 +142,6 @@ const TrainingPlane = () => {
     fetchTrainingPlane();
   };
 
-  /*   const handleSelectedTrainingDetails = (_id) => {
-    navigator(`/entrainements/details/${_id}`);
-  }; */
-
   return (
     <Container>
       <Header />
@@ -154,50 +151,61 @@ const TrainingPlane = () => {
           Retourner sur le panier d'éxercices
         </TopButton>
         <SearchBar
-        placeholder="Recherchez votre entrainement"
-        searched={search}
-        setSearched={setSearch}
-      />
+          placeholder="Recherchez votre entrainement"
+          searched={search}
+          setSearched={setSearch}
+        />
         <TopButton onClick={handleExercices}>
           Retourner sur les exercices
         </TopButton>
       </Top>
       <ContainerPlane>
         {trainingPlane.length > 0 &&
-          trainingPlane.filter((info) => {
-            console.log(info)
-            if(search === "") {
-              return info
-            } else if(info.trainingName.toLowerCase().includes(search.toLowerCase())) {
-              return info
-            }
-          }).map((training) => (
-            <>
-              <ContainerTrainingPlane key={training._id}>
-                <IconFoot src={foot} alt="foot" />
-                <Desc> <b>Entrainement : </b>{training.trainingName}</Desc>
-                <Desc>
-                <b>Temps Total de l'entrainement : </b> {training.total_time} min
-                </Desc>
-                <Desc>
-                <b> Nb d'exercices : </b> {training.nbTotal_exercices}
-                </Desc>
-                <Desc>
-                  {' '}
-                  <b>Desc de création : </b> {formatDate(training.updatedAt)}{' '}
-                </Desc>
-                <IconContainer>
-                  <Link
-                    to={`/entrainements/details/${training._id}`}
-                    state={{ data: training }}
-                  >
-                    <Icon src={searchPlan} />
-                  </Link>
-                  <Icon src={trash} onClick={() => handleReset(training._id)} />
-                </IconContainer>
-              </ContainerTrainingPlane>
-            </>
-          ))}
+          trainingPlane
+            .filter((info) => {
+              if (search === '') {
+                return info;
+              } else if (
+                info.trainingName.toLowerCase().includes(search.toLowerCase())
+              ) {
+                return info;
+              }
+            })
+            .map((training) => (
+              <>
+                <ContainerTrainingPlane key={training._id}>
+                  <IconFoot src={foot} alt="foot" />
+                  <Desc>
+                    {' '}
+                    <b>Entrainement : </b>
+                    {training.trainingName}
+                  </Desc>
+                  <Desc>
+                    <b>Temps Total de l'entrainement : </b>{' '}
+                    {training.total_time} min
+                  </Desc>
+                  <Desc>
+                    <b> Nb d'exercices : </b> {training.nbTotal_exercices}
+                  </Desc>
+                  <Desc>
+                    {' '}
+                    <b>Desc de création : </b> {formatDate(training.updatedAt)}{' '}
+                  </Desc>
+                  <IconContainer>
+                    <Link
+                      to={`/entrainements/details/${training._id}`}
+                      state={{ data: training }}
+                    >
+                      <Icon src={searchPlan} />
+                    </Link>
+                    <Icon
+                      src={trash}
+                      onClick={() => handleReset(training._id)}
+                    />
+                  </IconContainer>
+                </ContainerTrainingPlane>
+              </>
+            ))}
       </ContainerPlane>
       <Footer />
     </Container>

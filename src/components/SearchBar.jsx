@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+
 import cross from '../assets/cross.png';
 import search from '../assets/loupe.png';
 

@@ -8,7 +8,6 @@ import Footer from './Footer';
 import { useApp } from '../context/AppProvider';
 import FooterAdmin from './Admin/FooterAdmin';
 
-
 const Container = styled.div`
   width: 100%;
   height: 100%;
@@ -40,7 +39,7 @@ const Filter = styled.div`
   justify-content: center;
   background-color: white;
   border-radius: 2rem;
-  ${desktop({ })}
+  ${desktop({})}
 `;
 
 const FilterText = styled.span`
@@ -60,8 +59,8 @@ const Select = styled.select`
 `;
 
 const Button = styled.button`
-background-color: white;
-border:1px solid black;;
+  background-color: white;
+  border: 1px solid black;
   padding: 0.8rem;
   margin: 0.7rem 0rem;
   border-radius: 2rem;
@@ -108,15 +107,15 @@ const ExercicesList = () => {
           </Select>
           <Select name="typeTraining" onChange={handleFilters}>
             <Option disabled>Type d'entrainement</Option>
-            <Option>Physique</Option>
-            <Option>Stalom</Option>
-            <Option>Course</Option>
-            <Option>Gardien</Option>
-            <Option>Tir de precision</Option>
-            <Option>Pressing</Option>
-            <Option>Passe</Option>
+            <Option>physique</Option>
+            <Option>slalom</Option>
+            <Option>course</Option>
+            <Option>gardien</Option>
+            <Option>tir de precision</Option>
+            <Option>pressing</Option>
+            <Option>passe</Option>
+            <Option>tir </Option>
           </Select>
-        
         </Filter>
         <Filter>
           <FilterText>Trier les exercices: </FilterText>

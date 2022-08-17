@@ -1,8 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import logo from '../assets/logoTrainers8.png';
+
 import { desktop } from '../responsive';
+
+import logo from '../assets/logoTrainers8.png';
+
 
 const Header = () => {
   const Container = styled.div`

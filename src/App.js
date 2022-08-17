@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
 import TrainingOrder from './components/TrainingOrder';
 import CreateNewExercice from './components/CreateNewExercice';
 import DetailsExercice from './components/DetailsExercice';
@@ -6,7 +7,6 @@ import Disconnect from './components/Disconnect';
 import EditExercices from './components/EditExercices';
 import ExercicesList from './components/ExercicesList';
 import TrainingPlane from './components/TrainingPlane';
-
 import Home from './components/Home';
 import Login from './components/Login';
 import PageOutlet from './components/PageOutlet';
@@ -25,12 +25,12 @@ const App = () => {
         <Router>
           <Routes>
             <Route index element={<Home />} />
-            <Route path="/disconnect" element={<Disconnect />} />
+            <Route path="/deconnexion" element={<Disconnect />} />
             <Route path="/connexion" element={<Login />} />
             <Route path="/enregistrement" element={<Register />} />
             <Route path="/" element={<PageOutlet />}>
               <Route path="/exercices" element={<ExercicesList />} />
-              <Route path="/nouvelExercice" element={<CreateNewExercice />} />
+              <Route path="/nouvel-exercice" element={<CreateNewExercice />} />
               <Route path="/exercices/:id" element={<DetailsExercice />} />
               <Route
                 path="/exercices/:id/modifie"
@@ -42,8 +42,8 @@ const App = () => {
               <Route path="/entrainements/details/:id" element={<TrainingPlaneDetails />} />
             </Route>
             <Route path="/" element={<AdminRoute />}>
-            <Route path="/Admincoach" element={<AdminCoach />} />
-            <Route path="/AdminEntrainements" element={<AdminTrainingPlane />} />
+            <Route path="/admin-entraineurs" element={<AdminCoach />} />
+            <Route path="/admin-entrainements" element={<AdminTrainingPlane />} />
               </Route>
           </Routes>
         </Router>

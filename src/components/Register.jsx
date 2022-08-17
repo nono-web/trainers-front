@@ -21,7 +21,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  ${desktop({ height: '100vh'})}
+  ${desktop({ height: '130vh'})}
 `;
 
 const Wrapper = styled.div`
@@ -215,6 +215,7 @@ const Register = () => {
         );
         setCoach({ ...coach, res});
       return navigator('/connexion');
+     
     } catch (err) {
       setError(err.response.data)
       console.log(err.response.data);

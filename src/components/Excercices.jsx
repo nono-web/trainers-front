@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useApp } from '../context/AppProvider';
@@ -12,7 +11,12 @@ const Container = styled.div`
 `;
 
 const Excercices = ({ filters, sort }) => {
-  const { exercicesList, setExercicesList, favoritesExercicesList } = useApp();
+  const {
+    exercicesList,
+    setExercicesList,
+    favoritesExercicesList,
+    showFavorites,
+  } = useApp();
   const [filteredExercices, setFilteredExercices] = useState([]);
 
   useEffect(() => {
@@ -24,9 +28,6 @@ const Excercices = ({ filters, sort }) => {
       )
     );
   }, [filters, exercicesList]);
-
-  console.log(filteredExercices)
-  console.log(favoritesExercicesList)
 
   useEffect(() => {
     if (sort === 'newest') {
@@ -40,22 +41,32 @@ const Excercices = ({ filters, sort }) => {
     }
   }, [sort]);
 
-
-
-
+  const filterFavoriteExercice = exercicesList.filter((planex) =>
+    favoritesExercicesList.find((ex) => planex._id === ex)
+  );
 
   return (
     <Container>
-      {filteredExercices.map((item) => (
-        <Exercice
-          item={item}
-          key={item._id}
-          exercicesList={exercicesList}
-          setExercicesList={setExercicesList}
-          filteredExercices={filteredExercices}
-         
-        />
-      ))}
+      {!showFavorites &&
+        filteredExercices.map((item) => (
+          <Exercice
+            item={item}
+            key={item._id}
+            exercicesList={exercicesList}
+            setExercicesList={setExercicesList}
+            filteredExercices={filteredExercices}
+          />
+        ))}
+      {showFavorites &&
+        filterFavoriteExercice.map((item) => (
+          <Exercice
+            item={item}
+            key={item._id}
+            exercicesList={exercicesList}
+            setExercicesList={setExercicesList}
+            filteredExercices={filteredExercices}
+          />
+        ))}
     </Container>
   );
 };

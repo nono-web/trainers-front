@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { desktop } from '../../responsive';
 import axios from 'axios';
-import Header from '../Header';
-import searchPlan from '../../assets/search.png';
-import trash from '../../assets/poubelle.png';
-import foot from '../../assets/ballon-de-foot.png';
 import { useApp } from '../../context/AppProvider';
 import { useNavigate, Link } from 'react-router-dom';
+
+import { desktop } from '../../responsive';
+import Header from '../Header';
 import { formatDate } from '../../utils/formatDate';
 import FooterAdmin from './FooterAdmin';
 import SearchBar from '../SearchBar';
 
+import searchPlan from '../../assets/search.png';
+import trash from '../../assets/poubelle.png';
+import foot from '../../assets/ballon-de-foot.png';
+
+
 
 const Container = styled.div`
-  width: 100vw;
+  width: 100%;
   height: 100%;
   background: url('https://cdn.pixabay.com/photo/2014/10/14/20/24/ball-488701_960_720.jpg')
     center;
@@ -26,7 +29,7 @@ const Title = styled.h1`
   font-size: 2rem;
   text-align: center;
   margin: 1rem 0rem;
-  ${desktop({fontSize:'3rem' })}
+  ${desktop({ fontSize: '3rem' })}
 `;
 
 const Top = styled.div`
@@ -35,7 +38,7 @@ const Top = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 1.25rem;
-  ${desktop({flexDirection:'row'})}
+  ${desktop({ flexDirection: 'row' })}
 `;
 
 const TopButton = styled.button`
@@ -137,13 +140,15 @@ const AdminTrainingPlane = () => {
     fetchTrainingPlane();
     fetchAllCoach();
   }, []);
-  console.log('trianingplane', trainingPlane);
-  console.log('allCoach', allCoach);
+
+  console.log('allCoach', allCoach)
+  console.log('traningPlane', trainingPlane)
 
   const coachPlan = allCoach.filter((planex) =>
     trainingPlane.find((ex) => planex._id === ex.coachId)
   );
-  console.log('response1', coachPlan);
+
+  console.log('coachPlan', coachPlan)
 
   const handlePrev = () => {
     navigator(`/panierExercices/${coach._id}`);
@@ -169,62 +174,72 @@ const AdminTrainingPlane = () => {
           Retourner sur le panier d'éxercices
         </TopButton>
         <SearchBar
-        placeholder="Recherchez votre entrainement"
-        searched={search}
-        setSearched={setSearch}
-      />
+          placeholder="Rechercher votre entrainement"
+          searched={search}
+          setSearched={setSearch}
+        />
         <TopButton onClick={handleExercices}>
           Retourner sur les exercices
         </TopButton>
       </Top>
       <ContainerPlane>
         {trainingPlane.length > 0 &&
-           trainingPlane.filter((info) => {
-            console.log(info)
-            if(search === "") {
-              return info
-            } else if(info.trainingName.toLowerCase().includes(search.toLowerCase())) {
-              return info
-            }
-          }).map((training) => (
-            <>
-              <ContainerTrainingPlane key={training._id}>
-                <IconFoot src={foot} alt="foot" />
-                {coachPlan.length > 0 &&
-                  coachPlan.map((coach) => (
-                    <Desc>
-                      <b>Entraineur : </b>
-                      {coach.lastname} {coach.firstname}
-                    </Desc>
-                  ))}
-                <Desc>
-                  {' '}
-                  <b>Entrainement : </b> {training.trainingName}
-                </Desc>
-                <Desc>
-                  <b>Temps Total de l'entrainement : </b> {training.total_time}{' '}
-                  min
-                </Desc>
-                <Desc>
-                  <b> Nb d'exercices : </b>
-                  {training.nbTotal_exercices}
-                </Desc>
-                <Desc>
-                  {' '}
-                  <b>Desc de création : </b> {formatDate(training.updatedAt)}{' '}
-                </Desc>
-                <IconContainer>
-                  <Link
-                    to={`/entrainements/details/${training._id}`}
-                    state={{ data: training }}
-                  >
-                    <Icon src={searchPlan} />
-                  </Link>
-                  <Icon src={trash} onClick={() => handleReset(training._id)} />
-                </IconContainer>
-              </ContainerTrainingPlane>
-            </>
-          ))}
+          trainingPlane
+            .filter((info) => {
+              if (search === '') {
+                return info;
+              } else if (
+                info.trainingName.toLowerCase().includes(search.toLowerCase())
+              ) {
+                return info;
+              }
+            })
+            .map((training) => (
+              <>
+                <ContainerTrainingPlane key={training._id}>
+                  <IconFoot src={foot} alt="foot" />
+                  {coachPlan.length > 0 &&
+                    coachPlan.map((coach) =>
+                      coach._id === training.coachId ? (
+                        <Desc>
+                          <b>Entraineur : </b>
+                          {coach.lastname} {coach.firstname}
+                        </Desc>
+                      ) : (
+                        ''
+                      )
+                    )}
+                  <Desc>
+                    {' '}
+                    <b>Entrainement : </b> {training.trainingName}
+                  </Desc>
+                  <Desc>
+                    <b>Temps Total de l'entrainement : </b>{' '}
+                    {training.total_time} min
+                  </Desc>
+                  <Desc>
+                    <b> Nb d'exercices : </b>
+                    {training.nbTotal_exercices}
+                  </Desc>
+                  <Desc>
+                    {' '}
+                    <b>Desc de création : </b> {formatDate(training.updatedAt)}{' '}
+                  </Desc>
+                  <IconContainer>
+                    <Link
+                      to={`/entrainements/details/${training._id}`}
+                      state={{ data: training }}
+                    >
+                      <Icon src={searchPlan} />
+                    </Link>
+                    <Icon
+                      src={trash}
+                      onClick={() => handleReset(training._id)}
+                    />
+                  </IconContainer>
+                </ContainerTrainingPlane>
+              </>
+            ))}
       </ContainerPlane>
       <FooterAdmin />
     </Container>

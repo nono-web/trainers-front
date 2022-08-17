@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { desktop } from '../responsive';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useApp } from '../context/AppProvider';
@@ -15,6 +14,7 @@ import Select from '@mui/material/Select';
 import Chip from '@mui/material/Chip';
 import { useNavigate } from 'react-router-dom';
 
+import { desktop } from '../responsive';
 import Header from './Header';
 import Footer from './Footer';
 import FooterAdmin from './Admin/FooterAdmin';
@@ -148,6 +148,7 @@ const CreateNewExercice = () => {
   const [age, setAge] = useState([]);
   const [training, setTraining] = useState([]);
   const { coach } = useApp();
+
   const categorie = {
     'U6-U7': 'U6-U7',
     'U8-U9': 'U8-U9',
@@ -156,13 +157,14 @@ const CreateNewExercice = () => {
     'U14-U15': 'U14-U15',
   };
 
-  const type = {
+  const typeTrainings = {
     passe: 'passe',
     physique: 'phyisque',
-    stalom: 'stalom',
+    slalom: 'slalom',
     gardien: 'gardien',
     pressing: 'pressing',
     course: 'course',
+    tir:  'tir au but',
   };
 
   const schema = yup
@@ -226,7 +228,6 @@ const CreateNewExercice = () => {
       return navigator('/exercices');
     } catch (err) {
       setError(err.response.data);
-      console.log(err.response.data);
     }
   };
 
@@ -265,7 +266,6 @@ const CreateNewExercice = () => {
               />
             </Label>
           </FormContainer>
-
           <FormContainer>
             {errors.img && <ErrorYup>{errors.img.message}</ErrorYup>}
             <Label>
@@ -279,7 +279,6 @@ const CreateNewExercice = () => {
               />
             </Label>
           </FormContainer>
-
           <FormContainer>
             {errors.categoriesAge && (
               <ErrorYup>{errors.categoriesAge.message}</ErrorYup>
@@ -350,7 +349,7 @@ const CreateNewExercice = () => {
                     </Box>
                   )}
                 >
-                  {Object.values(type).map((types) => (
+                  {Object.values(typeTrainings).map((types) => (
                     <MenuItem key={types} value={types}>
                       {types}
                     </MenuItem>
@@ -380,7 +379,7 @@ const CreateNewExercice = () => {
           </ButtonContainer>
         </Form>
       </Wrapper>
-      {coach.isAdmin ? <FooterAdmin /> :  <Footer /> }
+      {coach.isAdmin ? <FooterAdmin /> : <Footer />}
     </Container>
   );
 };

@@ -1,5 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
+
+import { desktop } from '../responsive';
+import { useApp } from '../context/AppProvider';
 
 import terrain from '../assets/terrain-de-football.png';
 import entrainement from '../assets/entrainement.png';
@@ -7,9 +11,8 @@ import exercices from '../assets/cones.png';
 import entraineur from '../assets/entraineur.png';
 import disconnect from '../assets/sortir.png';
 import create from '../assets/coup-franc.png';
-import { Link } from 'react-router-dom';
-import { desktop } from '../responsive';
-import { useApp } from '../context/AppProvider';
+
+
 
 const Container = styled.div`
   background: linear-gradient(
@@ -70,7 +73,7 @@ const Footer = () => {
     {
       title: 'Créer un exercice',
       logo: create,
-      link: '/nouvelExercice',
+      link: '/nouvel-exercice',
     },
     {
       title: 'Exercices',
@@ -85,7 +88,7 @@ const Footer = () => {
     {
       title: 'Deconnexion',
       logo: disconnect,
-      link: '/disconnect',
+      link: '/deconnexion',
     },
   ];
   return (

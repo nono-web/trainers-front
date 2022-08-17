@@ -1,9 +1,10 @@
 import styled from 'styled-components';
-import { desktop } from '../responsive';
 import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
+
+import { desktop } from '../responsive';
 import { useApp } from '../context/AppProvider';
 import Header from './Header';
 import Footer from './Footer';
@@ -11,9 +12,9 @@ import Footer from './Footer';
 
 
 const Container = styled.div`
-  width: 100vw;
+  width: 100%;
   height: 100%;
-  background: url('https://cdn.pixabay.com/photo/2014/10/14/20/24/ball-488701_960_720.jpg')
+  background: url('https://cdn.pixabay.com/photo/2016/03/23/17/07/football-1275123_960_720.jpg')
     center;
   background-size: cover;
   ${desktop({ height: '100%' })}
@@ -95,9 +96,18 @@ const Label = styled.label`
   align-items: center;
   margin: 0.5rem;
   font-weight: bold;
-  color: white;
+  color: black;
   text-align: center;
 `;
+
+const MessageError = styled.p `
+  color: black;
+  background-color: red;
+  text-align: center;
+  font-size: 0.9rem;
+  ${desktop({ fontSize: '1.1rem' })}
+`;
+
 
 const Info = styled.div`
   flex: 3;
@@ -113,6 +123,7 @@ const Exercice = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: center;
   ${desktop({ flexDirection: 'row' })}
 `;
 
@@ -126,6 +137,7 @@ const ExerciceDetail = styled.div`
 
 const Image = styled.img`
   width: 12.5rem;
+  height: 10rem;
   cursor: pointer;
   margin-bottom: 1rem;
   margin-left: 1rem;
@@ -169,7 +181,7 @@ const ExerciceAmountContainer = styled.div`
   margin-bottom: 1.25rem;
 `;
 const ExerciceAmount = styled.div`
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   margin: 0.3rem;
 `;
 const ExerciceTime = styled.div`
@@ -185,18 +197,13 @@ const ContainerImgTrash = styled.div`
   justify-content: center;
 `;
 
-const ImageTrash = styled.img`
-  width: 3rem;
-  height: 3rem;
-`;
-
 const Summary = styled.div`
   background-color: white;
   flex: 1;
   border: 0.5px solid lightgray;
   border-radius: 2rem;
   padding: 1.25rem;
-  height: 40vh;
+  height: 45vh;
   ${desktop({ marginLeft: '1rem' })}
 `;
 
@@ -213,7 +220,7 @@ const SummaryItem = styled.div`
 
 const SummaryItemText = styled.span``;
 
-const SummaryItemPrice = styled.span``;
+const SummaryItemDesc = styled.span``;
 
 const SummaryButton = styled.button`
   width: 100%;
@@ -235,9 +242,14 @@ const SummaryButton = styled.button`
 
 const TrainingOrder = () => {
   const [trainingName, setTrainingName] = useState(null);
+  const [error, setError] = useState(null);
   const navigator = useNavigate();
   const { id } = useParams();
   const { orderTrainingPlane } = useApp();
+
+  const refreshPage= () => {
+    window.location.reload(false);
+  }
 
   const total_quantity = orderTrainingPlane
     .map((item) => {
@@ -246,7 +258,7 @@ const TrainingOrder = () => {
     .reduce((acc, value) => {
       return acc + value;
     }, 0);
-  console.log('Le total est', total_quantity); // 20
+ 
 
   const total_time = orderTrainingPlane
     .map((item) => {
@@ -256,7 +268,6 @@ const TrainingOrder = () => {
       return acc + value;
     }, 0);
 
-  console.log('Le total est', total_time); // 20
 
   const Time_Hours = (total_time / 60).toFixed(2);
 
@@ -280,8 +291,7 @@ const TrainingOrder = () => {
           .map((order) => order)
       )
     );
-    console.log(`order ${name} removed`);
-    alert(`order ${name} removed`);
+    refreshPage()
   };
 
   const onSubmit = async () => {
@@ -300,8 +310,9 @@ const TrainingOrder = () => {
       alert("L'entrainement est Prêt");
       localStorage.removeItem('orderTrainingPlane');
       navigator(`/entrainements/${values.coachId}`);
+      refreshPage()
     } catch (err) {
-      console.log(err.response.data);
+      setError(err.response.data);
     }
   };
 
@@ -317,13 +328,14 @@ const TrainingOrder = () => {
           </TopButton>
         </Top>
         <InputContainer>
-          <Label> Nom de l'entrainement (Obligatoire) :</Label>
+          <Label> Nom de l'entrainement * : </Label>
           <Input
             type="text"
             placeholder="Nom"
             name="trainingName"
             onChange={(e) => setTrainingName(e.target.value)}
           />
+          <MessageError>{error}</MessageError>
         </InputContainer>
         <Bottom>
           <Info>
@@ -373,15 +385,15 @@ const TrainingOrder = () => {
             <SummaryTitle>Récapitulatif de l'entrainement</SummaryTitle>
             <SummaryItem>
               <SummaryItemText>Nombre d'exercice : </SummaryItemText>
-              <SummaryItemPrice> {total_quantity}</SummaryItemPrice>
+              <SummaryItemDesc> {total_quantity}</SummaryItemDesc>
             </SummaryItem>
             <SummaryItem>
               <SummaryItemText>Temps de l'entrainement :</SummaryItemText>
-              <SummaryItemPrice> {total_time} min</SummaryItemPrice>
+              <SummaryItemDesc> {total_time} min</SummaryItemDesc>
             </SummaryItem>
             <SummaryItem>
               <SummaryItemText>Soit :</SummaryItemText>
-              <SummaryItemPrice> {Time_Hours} h</SummaryItemPrice>
+              <SummaryItemDesc> {Time_Hours} h</SummaryItemDesc>
             </SummaryItem>
             <SummaryButton onClick={onSubmit}>
               Commencer mon entrainement
